@@ -8,7 +8,8 @@ export let options = {
         { duration: "5s", target: "0" }
     ],
     thresholds: {
-        "http_req_duration": ["p(95)<3000", "avg<1500"],
+        "failed requests": ["rate<0.1"],
+        "http_req_duration": ["p(95)<10000", "avg<5000"],
         "http_req_connecting": ["max<3"]
     },
     ext: {

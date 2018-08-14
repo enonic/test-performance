@@ -1,10 +1,36 @@
 import { group, sleep } from 'k6';
+import { Trend, Rate, Counter, Gauge } from "k6/metrics";
 import http from 'k6/http';
 
 // Version: 1.3
 // Creator: Load Impact URL test analyzer
 
-export let options = { maxRedirects: 0 };
+// export let options = { maxRedirects: 0 };
+
+export let options = {
+    linger: true,
+    stages: [
+        { duration: "10s", target: "40" },
+        { duration: "30s", target: "50" },
+        { duration: "10s", target: "0" }
+    ],
+    thresholds: {
+        "failed requests": ["rate<0.01"],
+        "http_req_duration": ["p(95)<3000", "avg<1000"],
+        "http_req_connecting": ["max<3"]
+    },
+    ext: {
+        loadimpact: {
+            projectID : 3114611,
+            name : "Enonic cluster with K6",
+            distribution: {
+                scenarioLabel1: { loadZone: "amazon:kr:seoul", percent: 50 },
+                scenarioLabel2: { loadZone: "amazon:ie:dublin", percent: 50 }
+            }
+        }
+    }
+};
+
 
 export default function() {
 
