@@ -10,14 +10,13 @@ import http from 'k6/http';
 export let options = {
     linger: true,
     stages: [
-        { duration: "10s", target: "40" },
-        { duration: "30s", target: "50" },
+        { duration: "10s", target: "80" },
+        { duration: "50s", target: "100" },
         { duration: "10s", target: "0" }
     ],
     thresholds: {
         "failed requests": ["rate<0.01"],
-        "http_req_duration": ["p(95)<3000", "avg<1000"],
-        "http_req_connecting": ["max<3"]
+        "http_req_duration": ["avg<1000", "p(95)<3000", "p(80)<1500"]
     },
     ext: {
         loadimpact: {
