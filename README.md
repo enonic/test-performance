@@ -1,2 +1,2 @@
-# test-performance-load-impact
-A repo for performance test scripts for use with Load Impact
+# test-performance-research
+A repo for performance test scripts for use with Load Impact and possibly other tools.
