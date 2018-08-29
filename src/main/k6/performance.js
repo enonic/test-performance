@@ -4,14 +4,13 @@ import { Trend } from "k6/metrics";
 
 export let options = {
     stages: [
-        {duration: "5s", target: "25"},
-        {duration: "10s", target: "25"},
-        {duration: "5s", target: "0"}
+        {duration: "2s", target: "5"},
+        {duration: "2s", target: "0"}
     ],
     thresholds: {
-        "content_get": ["avg<20"],
-        "content_image": ["avg<40"],
-        "failed requests": ["rate<0.1"],
+        "content_get": ["avg<30"],
+        "content_image": ["avg<50"],
+        "create_folder": ["avg<60"],
         "http_req_duration": ["p(95)<10000", "avg<5000"],
         "http_req_connecting": ["max<3"]
     },
@@ -28,19 +27,22 @@ export let options = {
 };
 
 const baseUrl = 'https://qa.enonic.com/admin/rest';
-const contentImageMetric = new Trend("content_image");
+const getImageMetric = new Trend("content_image");
 const getContentMetric = new Trend("content_get");
+const createFolderMetric = new Trend("create_folder");
 
 
-export function loadImage(url) {
-    let res = http.get(url);
-    if (typeof debug !== 'undefined') {
+export function xp_login(username, password, debug) {
+    // First we login. We are not interested in performance metrics from these login transactions
+    let url = baseUrl + "/auth/login";
+    let payload = { user: username, password: password };
+    let res = http.post(url, JSON.stringify(payload), { headers: { "Content-Type": "application/json" } });
+    if (typeof debug !== 'undefined')
         console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
-    }
     return res;
 }
 
-export function testUrl(url, payload, metric) {
+export function testUrl(url, payload, metric, contentType) {
     let res = '';
     if (payload == null) {
         res = http.get(url);
@@ -49,42 +51,33 @@ export function testUrl(url, payload, metric) {
     }
     check(res, {
         "status is 200": (res) => res.status === 200,
-        "content-type is application/json": (res) => res.headers['Content-Type'] === "application/json",
+        ["content-type is " + contentType]: (res) => res.headers['Content-Type'] === contentType,
     });
-
-    let body = JSON.parse(res.body);
-    let text = '';
-    for (let key in body) {
-        text += 'Index is: ' + key + '\nDescription is:  ' + body[key]
-    }
-
-    console.log(text);
     metric.add(res.timings.duration);
+
+    // Display result to console (remove this code for real tests):
+//    let body = JSON.parse(res.body);
+//    let text = '';
+//    for (let key in body.data) {
+//        text += 'Index is: ' + key + '\nDescription is:  ' + JSON.stringify(body.data[key]) + '\n'
+//    }
+//    console.log(text);
+
 }
 
-export function xp_login(username, password, debug) {
-    // First we login. We are not interested in performance metrics from these login transactions
-    var url = "https://qa.enonic.com/admin/rest/auth/login";
-    var payload = { user: username, password: password };
-    var res = http.post(url, JSON.stringify(payload), { headers: { "Content-Type": "application/json" } });
-    if (typeof debug !== 'undefined')
-        console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
-    return res;
-};
-
 export default function () {
-    xp_login("pt@enonic.com", "PTpt123", true);
+    xp_login("pt@enonic.com", "PTpt123");
     group("load_resources", function () {
         // This is probably the way to go:
-        testUrl(baseUrl + '/content?id=1327ce09-d6f5-44ba-a899-42aa5427a432', null, getContentMetric );
 
-        // Simplified way to get image:
-        let res = loadImage('https://qa.enonic.com/admin/rest/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606');
-        check(res, {
-            "status is 200": (res) => res.status === 200,
-            "content-type is application/json": (res) => res.headers['Content-Type'] === "application/json",
-        });
-        contentImageMetric.add(res.timings.duration);
-        sleep(10);
+        // Get Content
+        testUrl(baseUrl + '/content?id=1327ce09-d6f5-44ba-a899-42aa5427a432', null, getContentMetric, "application/json" );
+
+        // Get Image
+        testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");
+
+        // Create folder
+        let folderName = 'folder-' + Math.floor((Math.random() * 1000000000) + 1);
+        testUrl(baseUrl + '/content/create/', {data: [], meta: [], displayName: "My Folder", parent: '/archive', name: folderName, contentType: "base:folder", requireValid: false}, createFolderMetric, "application/json");
     })
 };
