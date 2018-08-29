@@ -1,6 +1,6 @@
-import {group, check, sleep} from "k6";
+import {check, group, sleep} from "k6";
 import http from "k6/http";
-import { Trend } from "k6/metrics";
+import {Trend} from "k6/metrics";
 
 export let options = {
     stages: [
@@ -68,7 +68,8 @@ export function testUrl(url, payload, metric, contentType) {
 export default function () {
     xp_login("pt@enonic.com", "PTpt123");
     group("load_resources", function () {
-        // This is probably the way to go:
+
+        let testCounter = Math.floor((Math.random() * 1000000000) + 1);
 
         // Get Content
         testUrl(baseUrl + '/content?id=1327ce09-d6f5-44ba-a899-42aa5427a432', null, getContentMetric, "application/json" );
@@ -77,7 +78,6 @@ export default function () {
         testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");
 
         // Create folder
-        let folderName = 'folder-' + Math.floor((Math.random() * 1000000000) + 1);
-        testUrl(baseUrl + '/content/create/', {data: [], meta: [], displayName: "My Folder", parent: '/archive', name: folderName, contentType: "base:folder", requireValid: false}, createFolderMetric, "application/json");
+        testUrl(baseUrl + '/content/create/', {data: [], meta: [], displayName: "My Folder", parent: '/archive', name: 'folder-' + testCounter, contentType: "base:folder", requireValid: false}, createFolderMetric, "application/json");
     })
 };
