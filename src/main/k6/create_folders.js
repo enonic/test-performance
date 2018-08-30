@@ -42,7 +42,7 @@ export function xp_login(username, password, debug) {
 };
 
 
-export function createContent(name) {
+export function createContent(name,debug) {
     let url = baseUrl + '/content/create/';
     let body = {data: [], meta: [], displayName: "My Content", parent: '/', name: name, contentType: "base:folder", requireValid: false};
     let res = http.post(url, JSON.stringify(body), {headers: {"Content-Type": "application/json"}});
@@ -57,7 +57,7 @@ export default function () {
     group("create_folder", function () {
 
         var contentName = 'content-' + Math.floor((Math.random() * 1000000000) + 1);
-        let res = createContent(contentName);
+        let res = createContent(contentName,true);
         console.log("Create Content: status=" + String(res.status) + "  Body=" + res.body);
         check(res, {
             "status is 200": (res) => res.status === 200,
