@@ -9,8 +9,12 @@ export function updateContentUrl(baseUrl){
     return baseUrl+ '/content/update/';
 }
 
+export function publishContentUrl(baseUrl){
+    return baseUrl+ '/content/publish/';
+}
+
 // create a JSON string for the request's body for creating new folder in root directory
-export function requestBodyForCreateRootFolder(name, displayName, permissions) {
+export function payloadForCreateRootFolder(name, displayName, permissions) {
     let body = {data: [], meta: [], displayName: displayName, parent: '/', name: name, contentType: "base:folder", requireValid: false};
     if (permissions != undefined) {
         body.permissions = permissions;
@@ -18,11 +22,16 @@ export function requestBodyForCreateRootFolder(name, displayName, permissions) {
     return JSON.stringify(body);
 }
 
-export function requestBodyForUpdateFolder(id, contentName, newDisplayName, permissions) {
+export function payloadForUpdateFolder(id, contentName, newDisplayName, permissions) {
     let body = {contentId: id, data: [], meta: [], contentName: contentName, displayName: newDisplayName, inheritPermissions: false};
     if (permissions != undefined) {
         body.permissions = permissions;
     }
+    return JSON.stringify(body);
+}
+
+export function payloadForPublishContent(items) {
+    let body = {items: items, includeChildren: false};
     return JSON.stringify(body);
 }
 

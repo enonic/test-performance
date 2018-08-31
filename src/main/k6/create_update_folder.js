@@ -47,8 +47,8 @@ export function xp_login(username, password, debug) {
 // creates a content
 export function createContent(name, debug) {
     let url = utils.createContentUrl(baseUrl);
-    let body = utils.requestBodyForCreateRootFolder(name, "My Content");
-    let res = http.post(url, body, {headers: {"Content-Type": "application/json"}});
+    let payloadJson = utils.payloadForCreateRootFolder(name, "My Content");
+    let res = http.post(url, payloadJson, {headers: {"Content-Type": "application/json"}});
     if (typeof debug !== 'undefined') {
         console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -58,8 +58,8 @@ export function createContent(name, debug) {
 //updates content: changes only the display name
 export function updateContent(id, contentName, newDisplayname, debug) {
     let url = utils.updateContentUrl(baseUrl);
-    let body = utils.requestBodyForUpdateFolder(id, contentName, newDisplayname, utils.anonymousPermissions());
-    let res = http.post(url, body, {headers: {"Content-Type": "application/json"}});
+    let payloadJson = utils.payloadForUpdateFolder(id, contentName, newDisplayname, utils.anonymousPermissions());
+    let res = http.post(url, payloadJson, {headers: {"Content-Type": "application/json"}});
     if (typeof debug !== 'undefined') {
         console.log("Update content: status=" + String(res.status) + "  Body=" + res.body);
     }

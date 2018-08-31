@@ -58,10 +58,10 @@ export default function () {
 
         var contentName = 'content-' + Math.floor((Math.random() * 1000000000) + 1);
         let res = createContent(contentName,true);
-        console.log("Create Content: status=" + String(res.status) + "  Body=" + res.body);
         check(res, {
             "status is 200": (res) => res.status === 200,
             "content-type is application/json": (res) => res.headers['Content-Type'] === "application/json",
+            "transaction time OK": (res) => res.timings.duration < 200
         });
 
         getContentMetric.add(res.timings.duration);
