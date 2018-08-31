@@ -28,7 +28,7 @@ export function requestBodyForUpdateFolder(id, contentName, newDisplayName, perm
 
 // create Full Access permissions for Anonymous User
 export function anonymousPermissions() {
-    let perm = [
+    return  [
         {
             principal: {key: "user:system:anonymous", displayName: "Anonymous User"},
             allow: [
@@ -43,5 +43,4 @@ export function anonymousPermissions() {
             deny: []
         }
     ]
-    return perm;
 }

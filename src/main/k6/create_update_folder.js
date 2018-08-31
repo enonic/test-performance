@@ -35,9 +35,9 @@ const updateContentMetric = new Trend("create_update_folder");
 
 export function xp_login(username, password, debug) {
     // First we login. We are not interested in performance metrics from these login transactions
-    var url = "http://127.0.0.1:8080/admin/rest/auth/login";
-    var payload = {user: username, password: password};
-    var res = http.post(url, JSON.stringify(payload), {headers: {"Content-Type": "application/json"}});
+    let url = "http://127.0.0.1:8080/admin/rest/auth/login";
+    let payload = {user: username, password: password};
+    let res = http.post(url, JSON.stringify(payload), {headers: {"Content-Type": "application/json"}});
     if (typeof debug !== 'undefined') {
         console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -72,7 +72,7 @@ export default function () {
     xp_login("su", "password");
     group("create_update_folder", function () {
 
-        var contentName = 'content-' + Math.floor((Math.random() * 1000000000) + 1);
+        let contentName = 'content-' + Math.floor((Math.random() * 1000000000) + 1);
         let res = createContent(contentName);
         let response = JSON.parse(res.body);
         console.log("ID of the content to update is: " + response.id);
@@ -81,6 +81,7 @@ export default function () {
         check(res2, {
             "status is 200": (res2) => res2.status === 200,
             "content-type is application/json": (res2) => res2.headers['Content-Type'] === "application/json",
+            "transaction time OK": (res2) => res2.timings.duration < 200
         });
 
         updateContentMetric.add(res2.timings.duration);
