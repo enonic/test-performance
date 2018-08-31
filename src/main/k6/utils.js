@@ -30,8 +30,9 @@ export function payloadForUpdateFolder(id, contentName, newDisplayName, permissi
     return JSON.stringify(body);
 }
 
-export function payloadForPublishContent(items) {
-    let body = {items: items, includeChildren: false};
+export function payloadForPublishContent(ids) {
+
+    let body = {ids: ids, excludedIds:[],excludeChildrenIds:[], schedule: null};
     return JSON.stringify(body);
 }
 
