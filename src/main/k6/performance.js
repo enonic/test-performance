@@ -1,16 +1,17 @@
 import {check, group, sleep} from "k6";
 import http from "k6/http";
 import {Trend} from "k6/metrics";
+import * as common from "./common.js";
 
 export let options = {
     stages: [
-        {duration: "2s", target: "5"},
-        {duration: "2s", target: "0"}
+        {duration: "5s", target: "25"},
+        {duration: "5s", target: "0"}
     ],
     thresholds: {
         "content_get": ["avg<30"],
         "content_image": ["avg<50"],
-        "create_folder": ["avg<60"],
+        "create_folder": ["avg<70"],
         "http_req_duration": ["p(95)<10000", "avg<5000"],
         "http_req_connecting": ["max<3"]
     },
@@ -31,17 +32,6 @@ const getImageMetric = new Trend("content_image");
 const getContentMetric = new Trend("content_get");
 const createFolderMetric = new Trend("create_folder");
 
-
-export function xp_login(username, password, debug) {
-    // First we login. We are not interested in performance metrics from these login transactions
-    let url = baseUrl + "/auth/login";
-    let payload = { user: username, password: password };
-    let res = http.post(url, JSON.stringify(payload), { headers: { "Content-Type": "application/json" } });
-    if (typeof debug !== 'undefined')
-        console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
-    return res;
-}
-
 export function testUrl(url, payload, metric, contentType) {
     let res = '';
     if (payload == null) {
@@ -54,30 +44,40 @@ export function testUrl(url, payload, metric, contentType) {
         ["content-type is " + contentType]: (res) => res.headers['Content-Type'] === contentType,
     });
     metric.add(res.timings.duration);
+    sleep(1);
+
+    if (contentType === "application/json") {
+        let body = JSON.parse(res.body);
+        console.log(body.id);
+        return body.id;
+    }
 
     // Display result to console (remove this code for real tests):
-//    let body = JSON.parse(res.body);
-//    let text = '';
-//    for (let key in body.data) {
-//        text += 'Index is: ' + key + '\nDescription is:  ' + JSON.stringify(body.data[key]) + '\n'
-//    }
-//    console.log(text);
-
+    // if (logJson) {
+    //     let body = JSON.parse(res.body);
+    //     let text = '';
+    //     for (let key in body.data) {
+    //         text += 'Index is: ' + key + '\nDescription is:  ' + JSON.stringify(body.data[key]) + '\n'
+    //     }
+    //     console.log("ID: " + body.id);
+    //     console.log(text);
+    // }
 }
 
 export default function () {
-    xp_login("pt@enonic.com", "PTpt123");
+    common.xp_login("pt@enonic.com", "PTpt123", baseUrl);
     group("load_resources", function () {
 
         let testCounter = Math.floor((Math.random() * 1000000000) + 1);
 
         // Get Content
-        testUrl(baseUrl + '/content?id=1327ce09-d6f5-44ba-a899-42aa5427a432', null, getContentMetric, "application/json" );
+        // testUrl(baseUrl + '/content?id=1327ce09-d6f5-44ba-a899-42aa5427a432', null, getContentMetric, "application/json" );
 
         // Get Image
         testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");
 
         // Create folder
-        testUrl(baseUrl + '/content/create/', {data: [], meta: [], displayName: "My Folder", parent: '/archive', name: 'folder-' + testCounter, contentType: "base:folder", requireValid: false}, createFolderMetric, "application/json");
+        let contentId = testUrl(baseUrl + '/content/create/', {data: [], meta: [], displayName: "My Folder", parent: '/test', name: 'folder-' + testCounter, contentType: "base:folder", requireValid: false}, createFolderMetric, "application/json");
+        testUrl(baseUrl + '/content?id=' + contentId, null, getContentMetric, "application/json" );
     })
 };
