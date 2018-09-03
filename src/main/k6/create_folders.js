@@ -1,6 +1,7 @@
 import {group, check, sleep} from "k6";
 import http from "k6/http";
 import {Trend} from "k6/metrics";
+import * as common from "./common.js";
 
 export let options = {
     stages: [
@@ -29,35 +30,12 @@ export let options = {
 const baseUrl = 'http://127.0.0.1:8080/admin/rest';
 const getContentMetric = new Trend("content_create");
 
-
-export function xp_login(username, password, debug) {
-    // First we login. We are not interested in performance metrics from these login transactions
-    let url = "http://127.0.0.1:8080/admin/rest/auth/login";
-    let payload = {user: username, password: password};
-    let res = http.post(url, JSON.stringify(payload), {headers: {"Content-Type": "application/json"}});
-    if (typeof debug !== 'undefined') {
-        console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
-    }
-    return res;
-};
-
-
-export function createContent(name,debug) {
-    let url = baseUrl + '/content/create/';
-    let body = {data: [], meta: [], displayName: "My Content", parent: '/', name: name, contentType: "base:folder", requireValid: false};
-    let res = http.post(url, JSON.stringify(body), {headers: {"Content-Type": "application/json"}});
-    if (typeof debug !== 'undefined') {
-        console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
-    }
-    return res;
-}
-
 export default function () {
-    xp_login("su", "password", true);
+    common.xp_login("su", "password", baseUrl, true);
     group("create_folder", function () {
 
-        var contentName = 'content-' + Math.floor((Math.random() * 1000000000) + 1);
-        let res = createContent(contentName,true);
+        var contentName = 'folder-' + Math.floor((Math.random() * 1000000000) + 1);
+        let res = common.createFolder(contentName, baseUrl, true);
         check(res, {
             "status is 200": (res) => res.status === 200,
             "content-type is application/json": (res) => res.headers['Content-Type'] === "application/json",

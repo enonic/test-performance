@@ -1,9 +1,8 @@
 import {group, check, sleep} from "k6";
 import http from "k6/http";
 import {Trend} from "k6/metrics";
-// import { createRootFolderJson } from "./content_json.js";
 import * as utils from "./utils.js";
-
+import * as common from "./common.js";
 
 export let options = {
     stages: [
@@ -33,28 +32,6 @@ const baseUrl = 'http://127.0.0.1:8080/admin/rest';
 const updateContentMetric = new Trend("create_update_folder");
 
 
-export function xp_login(username, password, debug) {
-    // First we login. We are not interested in performance metrics from these login transactions
-    let url = "http://127.0.0.1:8080/admin/rest/auth/login";
-    let payload = {user: username, password: password};
-    let res = http.post(url, JSON.stringify(payload), {headers: {"Content-Type": "application/json"}});
-    if (typeof debug !== 'undefined') {
-        console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
-    }
-    return res;
-};
-
-// creates a content
-export function createContent(name, debug) {
-    let url = utils.createContentUrl(baseUrl);
-    let payloadJson = utils.payloadForCreateRootFolder(name, "My Content");
-    let res = http.post(url, payloadJson, {headers: {"Content-Type": "application/json"}});
-    if (typeof debug !== 'undefined') {
-        console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
-    }
-    return res;
-}
-
 //updates content: changes only the display name
 export function updateContent(id, contentName, newDisplayname, debug) {
     let url = utils.updateContentUrl(baseUrl);
@@ -67,17 +44,17 @@ export function updateContent(id, contentName, newDisplayname, debug) {
 }
 
 export default function () {
-    console.log("######################### Script started ##########");
+    console.log("######################### Update folder - script started ##########");
 
-    xp_login("su", "password");
+    common.xp_login("su", "password",baseUrl);
     group("create_update_folder", function () {
 
         let contentName = 'content-' + Math.floor((Math.random() * 1000000000) + 1);
-        let res = createContent(contentName);
-        let response = JSON.parse(res.body);
-        console.log("ID of the content to update is: " + response.id);
-        console.log("Content's name is: " + response.name);
-        let res2 = updateContent(response.id, response.name, 'new display name', true);
+        let res = common.createFolder(contentName,baseUrl);
+        let objJSON = JSON.parse(res.body);
+        console.log("ID of the content to update is: " + objJSON.id);
+        console.log("Content's name is: " + objJSON.name);
+        let res2 = updateContent(objJSON.id, objJSON.name, 'new display name', true);
         check(res2, {
             "status is 200": (res2) => res2.status === 200,
             "content-type is application/json": (res2) => res2.headers['Content-Type'] === "application/json",
