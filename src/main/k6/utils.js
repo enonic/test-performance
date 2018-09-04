@@ -14,6 +14,10 @@ export function publishContentUrl(baseUrl) {
     return baseUrl + '/content/publish/';
 }
 
+export function deleteContentUrl(baseUrl) {
+    return baseUrl + '/content/delete/';
+}
+
 export function loginUrl(baseUrl) {
     return baseUrl + "/auth/login";
 }
@@ -42,6 +46,11 @@ export function payloadForUpdateFolder(id, contentName, newDisplayName, permissi
         body.permissions = permissions;
     }
     return JSON.stringify(body);
+}
+// payload for 'offline'-folder
+export function payloadForDeleteContent(contentPaths) {
+    let payload = {contentPaths: contentPaths, deleteOnline: false};
+    return JSON.stringify(payload);
 }
 
 export function payloadForPublishContent(ids) {
