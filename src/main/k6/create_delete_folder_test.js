@@ -55,11 +55,14 @@ export default function () {
         let response = JSON.parse(res.body);
         console.log("ID of the content to delete is: " + response.id);
         let res2 = deleteContent(response.path, true);
+        if (res2.status === 200) {
+            console.log("Content has been deleted, timings.duration is :" + res2.timings.duration);
+        }
         check(res2, {
             "status is 200": (res2) => res2.status === 200,
             "content-type is application/json": (res2) => res2.headers['Content-Type'] === "application/json",
             "transaction time OK": (res2) => {
-                console.log("Content has been deleted, timings.duration is :" + res2.timings.duration);
+                res2.timings.duration< 40;
             }
         });
 

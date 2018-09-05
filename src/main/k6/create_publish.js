@@ -54,12 +54,14 @@ export default function () {
         let response = JSON.parse(res.body);
         console.log("ID of the content to publish is: " + response.id);
         let res2 = publishContent(response.id, true);
+        if (res2.status === 200) {
+            console.log("Content has been published, timings.duration is :" + res2.timings.duration);
+        }
         check(res2, {
             "status is 200": (res2) => res2.status === 200,
             "content-type is application/json": (res2) => res2.headers['Content-Type'] === "application/json",
             "transaction time OK": (res2) => {
-                console.log("Content has been published, timings.duration is :" + res2.timings.duration);
-                //res2.timings.duration < 10;
+                res2.timings.duration < 20;
             }
         });
 

@@ -2,6 +2,10 @@
 // This file contains methods, that generate and build payloads, URLs...
 //
 
+export function userUrl(baseUrl) {
+    return baseUrl + '/tool/com.enonic.xp.app.users/main/_/service/com.enonic.xp.app.users/graphql';
+}
+
 export function createContentUrl(baseUrl) {
     return baseUrl + '/content/create/';
 }
@@ -31,13 +35,57 @@ export function payloadForLogin(username, password) {
     return JSON.stringify(payload);
 }
 
-// create a JSON string for the request's body for creating new folder in root directory
+// creates a JSON string for the request's body for creating new folder in root directory
 export function payloadForCreateRootFolder(name, displayName, permissions) {
     let body = {data: [], meta: [], displayName: displayName, parent: '/', name: name, contentType: "base:folder", requireValid: false};
     if (permissions != undefined) {
         body.permissions = permissions;
     }
     return JSON.stringify(body);
+}
+
+export function payloadForDeleteSystemUser(displayName) {
+    const mutation = `mutation ($keys: [String]!) {
+    deletePrincipals(keys: $keys) {
+        principalKey
+        deleted
+        reason
+    }
+}`;
+    const variables = {
+        keys: [`user:system:${displayName}`],
+    };
+    return JSON.stringify({mutation, variables});
+}
+
+// creates a JSON string for the request's body for creating new user in system store
+export function payloadForCreateUser(displayName, email, password) {
+    const mutation = `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $password: String!, $memberships: [String]) {
+            createUser(key: $key, displayName: $displayName, email: $email, login: $login, password: $password, memberships: $memberships) {
+                key
+                login
+                displayName
+                email
+                memberships {
+                    key
+                    displayName
+                    description
+                }
+            }
+        }`;
+
+    const variables = {
+        type: 'user',
+        login: displayName,
+        userStore: 'system',
+        displayName: displayName,
+        email: email,
+        key: `user:system:${displayName}`,
+        memberships: [],
+        password: password
+    };
+
+    return JSON.stringify({mutation, variables});
 }
 
 export function payloadForUpdateFolder(id, contentName, newDisplayName, permissions) {
@@ -47,6 +95,7 @@ export function payloadForUpdateFolder(id, contentName, newDisplayName, permissi
     }
     return JSON.stringify(body);
 }
+
 // payload for 'offline'-folder
 export function payloadForDeleteContent(contentPaths) {
     let payload = {contentPaths: contentPaths, deleteOnline: false};
