@@ -26,7 +26,6 @@ export function createFolder(name, baseUrl, debug) {
 
 export function createUser(name, email, password,baseUrl,debug) {
     let url = utils.userUrl(baseUrl);
-    console.log("######################" + url);
     let payload = utils.payloadForCreateUser(name, email,password);
     let res = http.post(url, payload, utils.defaultParams());
     if (typeof debug !== 'undefined') {
@@ -39,5 +38,15 @@ export function deleteUser(baseUrl,displayName){
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteSystemUser(displayName);
     let res = http.post(url, payload, utils.defaultParams());
+    return res;
+}
+
+export function createRole(baseUrl, displayName,debug){
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForCreateRole(displayName);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Create Role: status=" + String(res.status) + "  Body=" + res.body);
+    }
     return res;
 }

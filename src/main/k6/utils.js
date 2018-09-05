@@ -84,6 +84,25 @@ export function payloadForCreateUser(displayName, email, password) {
         memberships: [],
         password: password
     };
+    return JSON.stringify({mutation, variables});
+}
+
+export function payloadForCreateRole(displayName) {
+    const mutation = `mutation ($key: String!, $displayName: String!, $description: String, $members: [String]) {
+            createRole(key: $key, displayName: $displayName, description: $description, members: $members) {
+                key
+                displayName
+                description
+                members 
+            }
+        }`;
+
+    const variables = {
+        displayName: displayName,
+        key: `role:${displayName}`,
+        members: [],
+        description: ''
+    };
 
     return JSON.stringify({mutation, variables});
 }
