@@ -10,7 +10,7 @@ export let options = {
         {duration: "5s", target: "0"}
     ],
     thresholds: {
-        "content_create": ["avg<200"],
+        "user_create": ["avg<200"],
         "failed requests": ["rate<0.1"],
         "http_req_duration": ["p(95)<10000", "avg<5000"],
         "http_req_connecting": ["max<3"]
