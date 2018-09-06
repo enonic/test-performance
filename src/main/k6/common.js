@@ -50,3 +50,24 @@ export function createRole(baseUrl, displayName,debug){
     }
     return res;
 }
+
+export function createSystemGroup(baseUrl, displayName,debug){
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForCreateSystemGroup(displayName);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Create Group: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
+
+export function addMembersToSystemGroup(baseUrl, displayName,members,debug){
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForAddMembersToSystemGroup(displayName,members);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Updating of the Group: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
+
