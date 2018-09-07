@@ -1,3 +1,6 @@
+// This test requires Superhero app to be installed, and that a folder "Test" is placed in the root of the Superhero structure.
+// All actions are done inside the /superhero/test folder.
+
 import {check, group, sleep} from "k6";
 import http from "k6/http";
 import {Trend} from "k6/metrics";
@@ -7,7 +10,7 @@ import * as utils from "./utils.js";
 export let options = {
     stages: [
         {duration: "5s", target: "12"},
-        {duration: "20s", target: "12"},
+        {duration: "5s", target: "12"},
         {duration: "5s", target: "0"}
     ],
     thresholds: {
@@ -36,11 +39,33 @@ const isAuthenticatedMetric = new Trend("auth_authenticated");
 const getImageMetric = new Trend("content_get_image");
 const getContentMetric = new Trend("content_get_folder");
 const createFolderMetric = new Trend("content_create_folder");
+const createContentMetric = new Trend("content_create");
 const updateFolderMetric = new Trend("content_update_folder");
 const publishFolderMetric = new Trend("content_publish_folder");
+const publishContentMetric = new Trend("content_publish");
 const deleteFolderMetric = new Trend("content_delete_folder");
 
-export function testUrl(url, payload, metric, contentType) {
+function payloadForSuperHeroPost(name, displayName, testCounter, parentFolder, permissions) {
+    let payloadData = [
+        {"name": "post", "type": "String", "values": [{"v": "<p>This is " + testCounter + " text!</p>\n"}]},
+        {"name": "tags", "type": "String", "values": [{"v": "SH-" + testCounter}]},
+        {"name": "enableComments", "type": "Boolean", "values": [{"v": true}]},
+        {"name": "stickyPost", "type": "Boolean", "values": [{"v": true}]},
+        {"name": "slideshow","type": "Boolean","values": [{"v": false}]}
+    ];
+    let payloadMeta = [
+        {
+            "data": [{"name": "menuItem", "type": "Boolean", "values": [{"v": false}]}, {"name": "menuName", "type": "String", "values": [{}]}],
+            "name": "com.enonic.app.superhero:menu-item"
+        }];
+    let body = {data: payloadData, meta: payloadMeta, displayName: displayName, parent: parentFolder, name: name, contentType: "com.enonic.app.superhero:post", requireValid: false};
+    if (permissions != undefined) {
+        body.permissions = permissions;
+    }
+    return JSON.stringify(body);
+}
+
+function testUrl(url, payload, metric, contentType) {
     let res = '';
     if (payload == null) {
         console.log('GET: ' + url);
@@ -83,7 +108,7 @@ export function testUrl(url, payload, metric, contentType) {
     // }
 }
 
-export function testUsersUrl(url, payload, metric) {
+function testUsersUrl(url, payload, metric) {
     let res = '';
     let contentType = "application/json";
     if (payload == null) {
@@ -114,10 +139,10 @@ export function testUsersUrl(url, payload, metric) {
 
 export default function () {
     testUsersUrl(utils.loginUrl(baseUrl), utils.payloadForLogin("pt@enonic.com", "PTpt123"), loginMetric);
-    sleep(1);
-    group("load_resources", function () {
+
+    group("test_contentstudio", function () {
+        // Verify that user is authenticated:
         testUsersUrl(baseUrl + "/auth/authenticated", null, isAuthenticatedMetric);
-        sleep(1);
 
         // Get Image
         // testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");  // QA
@@ -125,21 +150,36 @@ export default function () {
         sleep(1);
 
         let testCounter = Math.floor((Math.random() * 1000000000) + 1);
-        // Create folder
-        let contentId = testUrl(utils.createContentUrl(baseUrl), JSON.stringify({data: [], meta: [], displayName: "My Folder", parent: '/test', name: 'folder-' + testCounter, contentType: "base:folder", requireValid: false}), createFolderMetric, "application/json");
-        // Get folder as content
-        testUrl(baseUrl + '/content?id=' + contentId, null, getContentMetric, "application/json" );
+
+        // Folder:
+        // Create
+        let contentFolderId = testUrl(utils.createContentUrl(baseUrl), JSON.stringify({data: [], meta: [], displayName: "New Folder", parent: '/superhero/test', name: 'folder-' + testCounter, contentType: "base:folder", requireValid: false}), createFolderMetric, "application/json");
+        // Get
+        testUrl(baseUrl + '/content?id=' + contentFolderId, null, getContentMetric, "application/json" );
         sleep(1);
-        // Update folder
-        testUrl(utils.updateContentUrl(baseUrl), utils.payloadForUpdateFolder(contentId, 'folder-' + testCounter, 'New folder (' + testCounter + ')', utils.anonymousPermissions()), updateFolderMetric, "application/json");
+        // Update
+        testUrl(utils.updateContentUrl(baseUrl), utils.payloadForUpdateFolder(contentFolderId, 'folder-' + testCounter, 'Folder no: ' + testCounter, utils.anonymousPermissions()), updateFolderMetric, "application/json");
         sleep(1);
-        // Publish folder
-        testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentId]), publishFolderMetric, "application/json");
+        // Publish
+        testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentFolderId]), publishFolderMetric, "application/json");
         sleep(1);
 
-        testUrl(utils.deleteContentUrl(baseUrl), utils.payloadForDeleteContent(["/test/folder-" + testCounter]), deleteFolderMetric, "application/json");
+        // Custom content:
+        // Create
+        let contentId = testUrl(utils.createContentUrl(baseUrl), payloadForSuperHeroPost("post-" + testCounter, "Post-" + testCounter, testCounter, "/superhero/test/folder-" + testCounter), createContentMetric, "application/json");
+        // Publish
+        testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentId]), publishContentMetric, "application/json");
         sleep(1);
-        testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentId]), publishFolderMetric, "application/json");
+
+        // Upload Image to folder
+
+        testUrl(utils.deleteContentUrl(baseUrl), utils.payloadForDeleteContent(["/superhero/test/folder-" + testCounter]), deleteFolderMetric, "application/json");
         sleep(1);
-    })
+        testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentFolderId]), publishFolderMetric, "application/json");
+        sleep(1);
+    });
+
+    // group("test_users", function () {
+    //
+    // })
 };
