@@ -6,9 +6,9 @@ import * as utils from "./utils.js";
 
 export let options = {
     stages: [
-        {duration: "3s", target: "7"},
-        {duration: "7s", target: "7"},
-        {duration: "3s", target: "0"}
+        {duration: "5s", target: "12"},
+        {duration: "20s", target: "12"},
+        {duration: "5s", target: "0"}
     ],
     thresholds: {
         "content_get": ["avg<30"],
@@ -37,6 +37,7 @@ const getImageMetric = new Trend("content_get_image");
 const getContentMetric = new Trend("content_get_folder");
 const createFolderMetric = new Trend("content_create_folder");
 const updateFolderMetric = new Trend("content_update_folder");
+const publishFolderMetric = new Trend("content_publish_folder");
 const deleteFolderMetric = new Trend("content_delete_folder");
 
 export function testUrl(url, payload, metric, contentType) {
@@ -126,14 +127,19 @@ export default function () {
         let testCounter = Math.floor((Math.random() * 1000000000) + 1);
         // Create folder
         let contentId = testUrl(utils.createContentUrl(baseUrl), JSON.stringify({data: [], meta: [], displayName: "My Folder", parent: '/test', name: 'folder-' + testCounter, contentType: "base:folder", requireValid: false}), createFolderMetric, "application/json");
-        // Get content
+        // Get folder as content
         testUrl(baseUrl + '/content?id=' + contentId, null, getContentMetric, "application/json" );
+        sleep(1);
         // Update folder
         testUrl(utils.updateContentUrl(baseUrl), utils.payloadForUpdateFolder(contentId, 'folder-' + testCounter, 'New folder (' + testCounter + ')', utils.anonymousPermissions()), updateFolderMetric, "application/json");
+        sleep(1);
+        // Publish folder
+        testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentId]), publishFolderMetric, "application/json");
         sleep(1);
 
         testUrl(utils.deleteContentUrl(baseUrl), utils.payloadForDeleteContent(["/test/folder-" + testCounter]), deleteFolderMetric, "application/json");
         sleep(1);
-        // Publish folder
+        testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentId]), publishFolderMetric, "application/json");
+        sleep(1);
     })
 };
