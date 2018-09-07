@@ -9,7 +9,7 @@ export let options = {
         {duration: "5s", target: "0"}
     ],
     thresholds: {
-        "user_delete": ["avg<200"],
+        "delete_user": ["avg<200"],
         "failed requests": ["rate<0.1"],
         "http_req_duration": ["p(95)<10000", "avg<5000"],
         "http_req_connecting": ["max<3"]
@@ -17,7 +17,7 @@ export let options = {
     ext: {
         loadimpact: {
             projectID: 3114611,
-            name: "K6 deleting of users",
+            name: "K6, deleting of users",
             distribution: {
                 scenarioLabel1: {loadZone: "amazon:kr:seoul", percent: 50},
                 scenarioLabel2: {loadZone: "amazon:ie:dublin", percent: 50}
@@ -27,11 +27,11 @@ export let options = {
 };
 const baseUrl = 'http://127.0.0.1:8080/admin';
 const restUrl = 'http://127.0.0.1:8080/admin/rest';
-const deleteUserMetric = new Trend("user_delete");
+const deleteUserMetric = new Trend("delete_user");
 
 export default function () {
     common.xp_login("su", "password", restUrl, true);
-    group("user_delete", function () {
+    group("delete_user", function () {
 
         let userName = 'user-' + Math.floor((Math.random() * 1000000000) + 1);
         let email = userName + '@gmail.com';

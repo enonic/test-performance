@@ -103,7 +103,93 @@ export function payloadForCreateRole(displayName) {
         members: [],
         description: ''
     };
+    return JSON.stringify({mutation, variables});
+}
 
+export function payloadForCreateUserStore(displayName, key) {
+    const mutation = `mutation ($key: String!, $displayName: String!, $description: String, $authConfig: AuthConfigInput, $permissions: [UserStoreAccessControlInput]) {
+            createUserStore(key: $key, displayName: $displayName, description: $description, authConfig: $authConfig, permissions: $permissions) {
+                key
+                displayName
+                description
+                authConfig {
+                    applicationKey
+                    config
+                }
+                idProviderMode,
+                permissions {
+                    principal {
+                        displayName
+                        key
+                    }
+                    access
+                }
+            }
+        }`;
+
+    const variables = {
+        authConfig: {
+            applicationKey: "com.enonic.xp.app.standardidprovider",
+            config: "[]"
+        },
+
+        displayName: displayName,
+        key: key,
+        permissions: [{principal: "role:system.authenticated", access: "READ"},
+            {principal: "role:system.admin", access: "ADMINISTRATOR"},
+            {principal: "role:system.user.admin", access: "ADMINISTRATOR"}],
+        description: 'test api'
+    };
+    return JSON.stringify({mutation, variables});
+}
+
+export function payloadForAddMembersToSystemGroup(displayName, members) {
+    const mutation = `mutation ($key: String!, $displayName: String!, $description: String!, $addMembers: [String], $removeMembers: [String], $addMemberships: [String], $removeMemberships: [String]) {
+            updateGroup(key: $key, displayName: $displayName, description: $description, addMembers: $addMembers, removeMembers: $removeMembers, addMemberships: $addMemberships, removeMemberships: $removeMemberships) {
+                key
+                displayName
+                description
+                members
+                memberships {
+                    key
+                    displayName
+                    description
+                }
+            }
+        }`;
+    const variables = {
+        displayName: displayName,
+        description: 'test',
+        key: `group:system:${displayName}`,
+        addMembers: members,
+        removeMembers: [],
+        addMemberships: [],
+        removeMemberships: []
+    };
+    return JSON.stringify({mutation, variables});
+}
+
+export function payloadForCreateSystemGroup(displayName) {
+    const mutation = `mutation ($key: String!, $displayName: String!, $description: String, $members: [String], $memberships: [String]) {
+        createGroup(key: $key, displayName: $displayName, description: $description, members: $members, memberships: $memberships) {
+            key
+            displayName
+            description
+            members
+            memberships {
+                key
+                displayName
+                description
+            }
+        }
+    }`;
+    const variables = {
+        displayName: displayName,
+        key: `group:system:${displayName}`,
+        members: [],
+        memberships: [],
+        description: ''
+    };
     return JSON.stringify({mutation, variables});
 }
 
@@ -115,8 +201,9 @@ export function payloadForUpdateFolder(id, contentName, newDisplayName, permissi
     return JSON.stringify(body);
 }
 
-// payload for 'offline'-folder
+// payload for delete a 'offline'-folder
 export function payloadForDeleteContent(contentPaths) {
+    console.log("DEBUG: ##### PATH is :" + contentPaths[0]);
     let payload = {contentPaths: contentPaths, deleteOnline: false};
     return JSON.stringify(payload);
 }

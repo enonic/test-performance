@@ -2,7 +2,6 @@
 // This file contains methods, that are common to all the individual test cases.
 //
 
-
 import http from "k6/http";
 import * as utils from "./utils.js";
 
@@ -24,9 +23,9 @@ export function createFolder(name, baseUrl, debug) {
     return res;
 }
 
-export function createUser(name, email, password,baseUrl,debug) {
+export function createUser(name, email, password, baseUrl, debug) {
     let url = utils.userUrl(baseUrl);
-    let payload = utils.payloadForCreateUser(name, email,password);
+    let payload = utils.payloadForCreateUser(name, email, password);
     let res = http.post(url, payload, utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Create User: status=" + String(res.status) + "  Body=" + res.body);
@@ -34,14 +33,14 @@ export function createUser(name, email, password,baseUrl,debug) {
     return res;
 }
 
-export function deleteUser(baseUrl,displayName){
+export function deleteUser(baseUrl, displayName) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteSystemUser(displayName);
     let res = http.post(url, payload, utils.defaultParams());
     return res;
 }
 
-export function createRole(baseUrl, displayName,debug){
+export function createRole(baseUrl, displayName, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForCreateRole(displayName);
     let res = http.post(url, payload, utils.defaultParams());
@@ -50,3 +49,34 @@ export function createRole(baseUrl, displayName,debug){
     }
     return res;
 }
+
+export function createSystemGroup(baseUrl, displayName, debug) {
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForCreateSystemGroup(displayName);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Create Group: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
+
+export function addMembersToSystemGroup(baseUrl, displayName, members, debug) {
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForAddMembersToSystemGroup(displayName, members);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Updating of the Group: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
+
+export function createUserStore(baseUrl, displayName, key, debug) {
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForCreateUserStore(displayName,key);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Creating of User Store: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
+
