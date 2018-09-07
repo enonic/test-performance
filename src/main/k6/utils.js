@@ -73,7 +73,6 @@ export function payloadForCreateUser(displayName, email, password) {
                 }
             }
         }`;
-
     const variables = {
         type: 'user',
         login: displayName,
@@ -96,7 +95,6 @@ export function payloadForCreateRole(displayName) {
                 members 
             }
         }`;
-
     const variables = {
         displayName: displayName,
         key: `role:${displayName}`,
@@ -126,7 +124,6 @@ export function payloadForCreateUserStore(displayName, key) {
                 }
             }
         }`;
-
     const variables = {
         authConfig: {
             applicationKey: "com.enonic.xp.app.standardidprovider",
@@ -139,6 +136,51 @@ export function payloadForCreateUserStore(displayName, key) {
             {principal: "role:system.admin", access: "ADMINISTRATOR"},
             {principal: "role:system.user.admin", access: "ADMINISTRATOR"}],
         description: 'test api'
+    };
+    return JSON.stringify({mutation, variables});
+}
+
+export function payloadForAddMembersToRole(displayName, members) {
+    const mutation = `mutation ($key: String!, $displayName: String!, $description: String!, $addMembers: [String], $removeMembers: [String]) {
+            updateRole(key: $key, displayName: $displayName, description: $description, addMembers: $addMembers, removeMembers: $removeMembers) {
+                key
+                displayName
+                description
+                members
+            }
+        }`;
+    const variables = {
+        displayName: displayName,
+        description: 'test',
+        key: `role:${displayName}`,
+        addMembers: members,
+        removeMembers: [],
+    };
+    return JSON.stringify({mutation, variables});
+}
+
+export function payloadForAddMembershipsToUser(displayName, email, memberships) {
+    const mutation = `mutation ($key: String!, $displayName: String!, $email: String!, $login: String!, $addMemberships: [String], $removeMemberships: [String]) {
+            updateUser(key: $key, displayName: $displayName, email: $email, login: $login, addMemberships: $addMemberships, removeMemberships: $removeMemberships) {
+                key
+                login
+                displayName
+                email
+                memberships {
+                    key
+                    displayName
+                    description
+                }
+            }
+        }`;
+    const variables = {
+        displayName: displayName,
+        addMemberships: memberships,
+        key: `user:system:${displayName}`,
+        email: email,
+        login: displayName,
+        removeMembers: [],
+        removeMemberships: []
     };
     return JSON.stringify({mutation, variables});
 }

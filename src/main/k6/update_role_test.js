@@ -28,25 +28,24 @@ export let options = {
 
 const baseUrl = 'http://127.0.0.1:8080/admin';
 const restUrl = 'http://127.0.0.1:8080/admin/rest';
-const updateGroupMetric = new Trend("update_group");
+const updateRoleMetric = new Trend("update_role");
 
 
 export default function () {
-    console.log("######################### Add members to group - script started ##########");
+    console.log("######################### Add members to Role - script started ##########");
 
     common.xp_login("su", "password", restUrl);
-    group("update_group", function () {
-        let displayName = 'group-' + Math.floor((Math.random() * 1000000000) + 1);
-        common.createSystemGroup(baseUrl,displayName );
+    group("update_role", function () {
+        let displayName = 'role-' + Math.floor((Math.random() * 1000000000) + 1);
+        common.createRole(baseUrl,displayName );
         sleep(5);
-        let res2 = common.addMembersToSystemGroup(baseUrl,displayName, ["user:system:su"], true);
-        check(res2, {
-            "status is 200": (res2) => res2.status === 200,
-            "content-type is application/json": (res2) => res2.headers['Content-Type'] === "application/json",
-            "transaction time OK": (res2) => res2.timings.duration < 200
+        let updateResponse = common.addMembersToRole(baseUrl,displayName, ["user:system:su"], true);
+        check(updateResponse, {
+            "status is 200": (updateResponse) => updateResponse.status === 200,
+            "content-type is application/json": (updateResponse) => updateResponse.headers['Content-Type'] === "application/json",
+            "transaction time OK": (updateResponse) => updateResponse.timings.duration < 300
         });
-
-        updateGroupMetric.add(res2.timings.duration);
+        updateRoleMetric.add(updateResponse.timings.duration);
         sleep(5);
     })
 };

@@ -19,7 +19,7 @@ export let options = {
     ext: {
         loadimpact: {
             projectID: 3114611,
-            name: "K6 performance research",
+            name: "performance testing: delete folders",
             distribution: {
                 scenarioLabel1: {loadZone: "amazon:kr:seoul", percent: 50},
                 scenarioLabel2: {loadZone: "amazon:ie:dublin", percent: 50}
@@ -62,7 +62,7 @@ export default function () {
             "status is 200": (res2) => res2.status === 200,
             "content-type is application/json": (res2) => res2.headers['Content-Type'] === "application/json",
             "transaction time OK": (res2) => {
-                res2.timings.duration< 40;
+                res2.timings.duration < 40;
             }
         });
 
