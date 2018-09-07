@@ -1,12 +1,14 @@
 import {check, group, sleep} from "k6";
 import http from "k6/http";
 import {Trend} from "k6/metrics";
-import * as common from "./common.js";
+// import * as common from "./common.js";
+import * as utils from "./utils.js";
 
 export let options = {
     stages: [
-        {duration: "5s", target: "25"},
-        {duration: "5s", target: "0"}
+        {duration: "3s", target: "7"},
+        {duration: "7s", target: "7"},
+        {duration: "3s", target: "0"}
     ],
     thresholds: {
         "content_get": ["avg<30"],
@@ -27,28 +29,44 @@ export let options = {
     }
 };
 
-const baseUrl = 'https://qa.enonic.com/admin/rest';
-const getImageMetric = new Trend("content_image");
-const getContentMetric = new Trend("content_get");
-const createFolderMetric = new Trend("create_folder");
+// const baseUrl = 'https://qa.enonic.com/admin/rest';
+const baseUrl = 'http://127.0.0.1:8080/admin/rest';
+const loginMetric = new Trend("auth_login");
+const isAuthenticatedMetric = new Trend("auth_authenticated");
+const getImageMetric = new Trend("content_get_image");
+const getContentMetric = new Trend("content_get_folder");
+const createFolderMetric = new Trend("content_create_folder");
+const updateFolderMetric = new Trend("content_update_folder");
+const deleteFolderMetric = new Trend("content_delete_folder");
 
 export function testUrl(url, payload, metric, contentType) {
     let res = '';
     if (payload == null) {
+        console.log('GET: ' + url);
         res = http.get(url);
     } else {
-        res = http.post(url, JSON.stringify(payload), {headers: {"Content-Type": "application/json"}});
+        console.log('POST: ' + url);
+        res = http.post(url, payload, {headers: {"Content-Type": "application/json"}});
     }
+
     check(res, {
         "status is 200": (res) => res.status === 200,
         ["content-type is " + contentType]: (res) => res.headers['Content-Type'] === contentType,
     });
     metric.add(res.timings.duration);
-    sleep(1);
+
+    if (res.status === 200) {
+        console.log("Response status: " + res.status);
+    } else {
+        console.log("Response error: " + res.status);
+        console.log(" - with url: " + url);
+        console.log(" - with payload: " + payload);
+        console.log(" - with response: " + res.body);
+    }
 
     if (contentType === "application/json") {
         let body = JSON.parse(res.body);
-        console.log(body.id);
+        console.log(body.id + ' / Name: ' + body.name);
         return body.id;
     }
 
@@ -64,20 +82,58 @@ export function testUrl(url, payload, metric, contentType) {
     // }
 }
 
+export function testUsersUrl(url, payload, metric) {
+    let res = '';
+    let contentType = "application/json";
+    if (payload == null) {
+        console.log('GET: ' + url);
+        res = http.get(url);
+    } else {
+        console.log('POST: ' + url);
+        res = http.post(url, payload, {headers: {"Content-Type": contentType}});
+    }
+
+    console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
+
+    check(res, {
+        "status is 200": (res) => res.status === 200,
+        ["content-type is " + contentType]: (res) => res.headers['Content-Type'] === contentType,
+    });
+    metric.add(res.timings.duration);
+
+    let body = JSON.parse(res.body);
+    if (body.authenticated === true) {
+        console.log("User is authenticated: " + body.user.displayName + " - E-mail:" + body.user.email);
+        return true;
+    } else {
+        console.log("Login failed");
+        return false;
+    }
+}
+
 export default function () {
-    common.xp_login("pt@enonic.com", "PTpt123", baseUrl);
+    testUsersUrl(utils.loginUrl(baseUrl), utils.payloadForLogin("pt@enonic.com", "PTpt123"), loginMetric);
+    sleep(1);
     group("load_resources", function () {
-
-        let testCounter = Math.floor((Math.random() * 1000000000) + 1);
-
-        // Get Content
-        // testUrl(baseUrl + '/content?id=1327ce09-d6f5-44ba-a899-42aa5427a432', null, getContentMetric, "application/json" );
+        testUsersUrl(baseUrl + "/auth/authenticated", null, isAuthenticatedMetric);
+        sleep(1);
 
         // Get Image
-        testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");
+        // testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");  // QA
+        testUrl(baseUrl + '/content/image/6f86f950-324f-46ef-ab59-e18f7ab76527?size=1258', null, getImageMetric, "image/jpeg");  // localhost
+        sleep(1);
 
+        let testCounter = Math.floor((Math.random() * 1000000000) + 1);
         // Create folder
-        let contentId = testUrl(baseUrl + '/content/create/', {data: [], meta: [], displayName: "My Folder", parent: '/test', name: 'folder-' + testCounter, contentType: "base:folder", requireValid: false}, createFolderMetric, "application/json");
+        let contentId = testUrl(utils.createContentUrl(baseUrl), JSON.stringify({data: [], meta: [], displayName: "My Folder", parent: '/test', name: 'folder-' + testCounter, contentType: "base:folder", requireValid: false}), createFolderMetric, "application/json");
+        // Get content
         testUrl(baseUrl + '/content?id=' + contentId, null, getContentMetric, "application/json" );
+        // Update folder
+        testUrl(utils.updateContentUrl(baseUrl), utils.payloadForUpdateFolder(contentId, 'folder-' + testCounter, 'New folder (' + testCounter + ')', utils.anonymousPermissions()), updateFolderMetric, "application/json");
+        sleep(1);
+
+        testUrl(utils.deleteContentUrl(baseUrl), utils.payloadForDeleteContent(["/test/folder-" + testCounter]), deleteFolderMetric, "application/json");
+        sleep(1);
+        // Publish folder
     })
 };
