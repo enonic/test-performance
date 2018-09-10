@@ -49,6 +49,15 @@ export function createRole(baseUrl, displayName, debug) {
     }
     return res;
 }
+export function deleteRole(baseUrl, displayName, debug) {
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForDeleteRole(displayName);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Delete Role action: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
 
 export function createSystemGroup(baseUrl, displayName, debug) {
     let url = utils.userUrl(baseUrl);
@@ -59,7 +68,15 @@ export function createSystemGroup(baseUrl, displayName, debug) {
     }
     return res;
 }
-
+export function deleteSystemGroup(baseUrl,displayName,debug){
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForDeleteSystemGroup(displayName);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Delete Group action: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
 export function addMembersToSystemGroup(baseUrl, displayName, members, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForAddMembersToSystemGroup(displayName, members);
@@ -87,13 +104,22 @@ export function createUserStore(baseUrl, displayName, key, debug) {
     }
     return res;
 }
+export function deleteUserStore(baseUrl,key,debug){
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForDeleteUserStore(key);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Delete User Store action: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
 
 export function addMembershipsToUser(baseUrl,displayName,email,roles,debug){
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForAddMembershipsToUser(displayName,email,roles);
     let res = http.post(url, payload, utils.defaultParams());
     if (typeof debug !== 'undefined') {
-        console.log("Update the User: status=" + String(res.status) + "  Body=" + res.body);
+        console.log("Update User action: status=" + String(res.status) + "  Body=" + res.body);
     }
     return res;
 }

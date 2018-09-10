@@ -9,15 +9,15 @@ export let options = {
         {duration: "5s", target: "0"}
     ],
     thresholds: {
-        "delete_user": ["avg<200"],
+        "delete_user_store": ["avg<300"],
         "failed requests": ["rate<0.1"],
         "http_req_duration": ["p(95)<10000", "avg<5000"],
         "http_req_connecting": ["max<3"]
     },
     ext: {
         loadimpact: {
-            projectID: 3114611,
-            name: "K6, deleting of users",
+            projectID: 31147611,
+            name: "K6, deleting of roles",
             distribution: {
                 scenarioLabel1: {loadZone: "amazon:kr:seoul", percent: 50},
                 scenarioLabel2: {loadZone: "amazon:ie:dublin", percent: 50}
@@ -27,28 +27,28 @@ export let options = {
 };
 const baseUrl = 'http://127.0.0.1:8080/admin';
 const restUrl = 'http://127.0.0.1:8080/admin/rest';
-const deleteUserMetric = new Trend("delete_user");
+const deleteUserStoreMetric = new Trend("delete_user_store");
 
 export default function () {
     common.xp_login("su", "password", restUrl);
-    group("delete_user", function () {
+    group("delete_user_store", function () {
 
-        let userName = 'user-' + Math.floor((Math.random() * 1000000000) + 1);
-        let email = userName + '@gmail.com';
-        common.createUser(userName, email, 'password', baseUrl);
+        let displayName = 'store-' + Math.floor((Math.random() * 1000000000) + 1);
+        let key = 'key-' + Math.floor((Math.random() * 1000000000) + 1);
+        common.createUserStore(baseUrl, displayName,key);
         sleep(5);
-        console.log("User should be deleted :" + userName);
-        let respDelete = common.deleteUser(baseUrl,userName);
+        console.log("Store should be deleted :" + displayName);
+        let respDelete = common.deleteUserStore(baseUrl, key,true);
         check(respDelete, {
             "status is 200": (respDelete) => {
                 respDelete.status === 200
             },
             "content-type is application/json": (resp) => resp.headers['Content-Type'] === "application/json",
             "transaction time OK": (resp) => {
-                resp.timings.duration < 200;
+                resp.timings.duration < 300;
             }
         });
-        deleteUserMetric.add(respDelete.timings.duration);
+        deleteUserStoreMetric.add(respDelete.timings.duration);
         sleep(10);
     })
 };

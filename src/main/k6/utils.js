@@ -104,6 +104,35 @@ export function payloadForCreateRole(displayName) {
     return JSON.stringify({mutation, variables});
 }
 
+export function payloadForDeleteRole(displayName) {
+    const mutation = `mutation ($keys: [String]!) {
+            deletePrincipals(keys: $keys) {
+                principalKey
+                deleted
+                reason
+            }
+        }`;
+    const variables = {
+        keys: [`role:${displayName}`],
+    };
+    return JSON.stringify({mutation, variables});
+}
+
+export function payloadForDeleteUserStore(key) {
+    const mutation = `mutation ($keys: [String]!) {
+            deleteUserStores(keys: $keys) {
+                userStoreKey
+                deleted
+                reason
+            }
+        }`;
+    const variables = {
+        keys: [key],
+    };
+    return JSON.stringify({mutation, variables});
+
+}
+
 export function payloadForCreateUserStore(displayName, key) {
     const mutation = `mutation ($key: String!, $displayName: String!, $description: String, $authConfig: AuthConfigInput, $permissions: [UserStoreAccessControlInput]) {
             createUserStore(key: $key, displayName: $displayName, description: $description, authConfig: $authConfig, permissions: $permissions) {
@@ -231,6 +260,20 @@ export function payloadForCreateSystemGroup(displayName) {
         members: [],
         memberships: [],
         description: ''
+    };
+    return JSON.stringify({mutation, variables});
+}
+
+export function payloadForDeleteSystemGroup(displayName) {
+    const mutation = `mutation ($keys: [String]!) {
+            deletePrincipals(keys: $keys) {
+                principalKey
+                deleted
+                reason
+            }
+        }`;
+    const variables = {
+        keys: [`group:system:${displayName}`],
     };
     return JSON.stringify({mutation, variables});
 }
