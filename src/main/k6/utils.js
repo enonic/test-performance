@@ -169,6 +169,40 @@ export function payloadForCreateUserStore(displayName, key) {
     return JSON.stringify({mutation, variables});
 }
 
+export function payloadForUpdatePermissionsInUserStore(displayName, key, permissions) {
+    const mutation = `mutation ($key: String!, $displayName: String!, $description: String, $authConfig: AuthConfigInput, $permissions: [UserStoreAccessControlInput]) {
+            updateUserStore(key: $key, displayName: $displayName, description: $description, authConfig: $authConfig, permissions: $permissions) {
+                key
+                displayName
+                description
+                authConfig {
+                    applicationKey
+                    config
+                }
+                idProviderMode,
+                permissions {
+                    principal {
+                        displayName
+                        key
+                    }
+                    access
+                }
+            }
+        }`;
+    const variables = {
+        authConfig: {
+            applicationKey: "com.enonic.xp.app.standardidprovider",
+            config: "[]"
+        },
+
+        displayName: displayName,
+        key: key,
+        permissions: permissions,
+        description: 'test api'
+    };
+    return JSON.stringify({mutation, variables});
+}
+
 export function payloadForAddMembersToRole(displayName, members) {
     const mutation = `mutation ($key: String!, $displayName: String!, $description: String!, $addMembers: [String], $removeMembers: [String]) {
             updateRole(key: $key, displayName: $displayName, description: $description, addMembers: $addMembers, removeMembers: $removeMembers) {
@@ -315,4 +349,16 @@ export function anonymousPermissions() {
             deny: []
         }
     ]
+}
+
+//return array of default permissions + permissions for everyone
+export function storeWithPermissionsForEveryone() {
+    return [{principal: "role:system.authenticated", access: "READ"},
+            {principal: "role:system.admin", access: "ADMINISTRATOR"},
+            {principal: "role:system.user.admin", access: "ADMINISTRATOR"},
+            {principal: "role:system.everyone", access: "CREATE_USERS"}
+        ]
+
+
+
 }

@@ -86,7 +86,8 @@ export function addMembersToSystemGroup(baseUrl, displayName, members, debug) {
     }
     return res;
 }
-export function addMembersToRole(baseUrl, displayName, members, debug){
+
+export function addMembersToRole(baseUrl, displayName, members, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForAddMembersToRole(displayName, members);
     let res = http.post(url, payload, utils.defaultParams());
@@ -95,16 +96,28 @@ export function addMembersToRole(baseUrl, displayName, members, debug){
     }
     return res;
 }
+
 export function createUserStore(baseUrl, displayName, key, debug) {
     let url = utils.userUrl(baseUrl);
-    let payload = utils.payloadForCreateUserStore(displayName,key);
+    let payload = utils.payloadForCreateUserStore(displayName, key);
     let res = http.post(url, payload, utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Creating of User Store: status=" + String(res.status) + "  Body=" + res.body);
     }
     return res;
 }
-export function deleteUserStore(baseUrl,key,debug){
+
+export function updatePermissionsInUserStore(baseUrl, displayName, key, permissions, debug) {
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForUpdatePermissionsInUserStore(displayName, key, permissions);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Update User Store action: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
+
+export function deleteUserStore(baseUrl, key, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteUserStore(key);
     let res = http.post(url, payload, utils.defaultParams());
@@ -114,9 +127,9 @@ export function deleteUserStore(baseUrl,key,debug){
     return res;
 }
 
-export function addMembershipsToUser(baseUrl,displayName,email,roles,debug){
+export function addMembershipsToUser(baseUrl, displayName, email, roles, debug) {
     let url = utils.userUrl(baseUrl);
-    let payload = utils.payloadForAddMembershipsToUser(displayName,email,roles);
+    let payload = utils.payloadForAddMembershipsToUser(displayName, email, roles);
     let res = http.post(url, payload, utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Update User action: status=" + String(res.status) + "  Body=" + res.body);
