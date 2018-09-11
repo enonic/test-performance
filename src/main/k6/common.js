@@ -33,10 +33,13 @@ export function createUser(name, email, password, baseUrl, debug) {
     return res;
 }
 
-export function deleteUser(baseUrl, displayName) {
+export function deleteUser(baseUrl, displayName,debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteSystemUser(displayName);
     let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Delete User action: status=" + String(res.status) + "  Body=" + res.body);
+    }
     return res;
 }
 

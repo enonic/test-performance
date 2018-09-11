@@ -10,7 +10,7 @@ export let options = {
         {duration: "5s", target: "0"}
     ],
     thresholds: {
-        "add_user_to_group": ["avg<200"],
+        "add_user_to_group": ["avg<500"],
         "failed requests": ["rate<0.1"],
         "http_req_duration": ["p(95)<10000", "avg<5000"],
         "http_req_connecting": ["max<3"]
@@ -48,7 +48,7 @@ export default function () {
     common.createUser(userName, email, 'password', baseUrl);
     group("add_user_to_group", function () {
 
-        let updateResponse = common.addMembershipsToUser(baseUrl, userName, email, ['group:system:' + groupName]);
+        let updateResponse = common.addMembershipsToUser(baseUrl, userName, email, ['group:system:' + groupName],true);
         check(updateResponse, {
             "status is 200": (updateResponse) => {
                 updateResponse.status === 200
@@ -56,7 +56,7 @@ export default function () {
             "content-type is application/json": (updateResponse) => updateResponse.headers['Content-Type'] === "application/json",
             "transaction time OK": (updateResponse) => {
                 console.log(' updateResponse.timings.duration :'  +  updateResponse.timings.duration );
-                updateResponse.timings.duration < 300;
+                updateResponse.timings.duration < 500;
             }
         });
         updateUserMetric.add(updateResponse.timings.duration);

@@ -38,7 +38,7 @@ export default function () {
         common.createUser(userName, email, 'password', baseUrl);
         sleep(5);
         console.log("User should be deleted :" + userName);
-        let respDelete = common.deleteUser(baseUrl,userName);
+        let respDelete = common.deleteUser(baseUrl,userName,true);
         check(respDelete, {
             "status is 200": (respDelete) => {
                 respDelete.status === 200

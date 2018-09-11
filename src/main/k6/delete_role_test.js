@@ -37,7 +37,7 @@ export default function () {
         common.createRole(baseUrl, displayName, true);
         sleep(5);
         console.log("Role should be deleted :" + displayName);
-        let respDelete = common.deleteRole(baseUrl, displayName);
+        let respDelete = common.deleteRole(baseUrl, displayName,true);
         check(respDelete, {
             "status is 200": (respDelete) => {
                 respDelete.status === 200
