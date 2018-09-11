@@ -36,9 +36,6 @@ export default function () {
         let displayName = 'group-' + Math.floor((Math.random() * 1000000000) + 1);
         let res = common.createSystemGroup(baseUrl, displayName,true);
 
-        if (res.status === 200) {
-            console.log("new Group has been created!, timings.duration is :" + res.timings.duration);
-        }
         check(res, {
             "status is 200": (res) => {
                 res.status === 200

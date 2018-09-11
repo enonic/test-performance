@@ -68,7 +68,8 @@ export function createSystemGroup(baseUrl, displayName, debug) {
     }
     return res;
 }
-export function deleteSystemGroup(baseUrl,displayName,debug){
+
+export function deleteSystemGroup(baseUrl, displayName, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteSystemGroup(displayName);
     let res = http.post(url, payload, utils.defaultParams());
@@ -77,6 +78,7 @@ export function deleteSystemGroup(baseUrl,displayName,debug){
     }
     return res;
 }
+
 export function addMembersToSystemGroup(baseUrl, displayName, members, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForAddMembersToSystemGroup(displayName, members);
@@ -127,9 +129,9 @@ export function deleteUserStore(baseUrl, key, debug) {
     return res;
 }
 
-export function addMembershipsToUser(baseUrl, displayName, email, roles, debug) {
+export function addMembershipsToUser(baseUrl, displayName, email, memberships, debug) {
     let url = utils.userUrl(baseUrl);
-    let payload = utils.payloadForAddMembershipsToUser(displayName, email, roles);
+    let payload = utils.payloadForAddMembershipsToUser(displayName, email, memberships);
     let res = http.post(url, payload, utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Update User action: status=" + String(res.status) + "  Body=" + res.body);
