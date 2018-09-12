@@ -145,7 +145,7 @@ export function addMembershipsToUser(baseUrl, displayName, email, memberships, d
 
 export function aggregateRoles(baseUrl, debug) {
     let url = utils.userUrl(baseUrl);
-    let payload = utils.payloadForAggregateRoles();
+    let payload = utils.payloadForAggregate(["ROLE"]);
     let res = http.post(url, payload, utils.defaultParams());
     if (typeof debug !== 'undefined') {
         let body = JSON.parse(res.body);
@@ -154,4 +154,14 @@ export function aggregateRoles(baseUrl, debug) {
     return res;
 }
 
+export function aggregateRolesAndUsers(baseUrl, debug) {
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForAggregate( ["ROLE", "USER"]);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        let body = JSON.parse(res.body);
+        console.log("Aggregate Roles and Users action: status=" + String(res.status) + "  totalCount=" + body.data.userItemsConnection.totalCount);
+    }
+    return res;
+}
 

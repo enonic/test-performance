@@ -332,7 +332,7 @@ export function payloadForPublishContent(ids) {
     return JSON.stringify(body);
 }
 
-export function payloadForAggregateRoles() {
+export function payloadForAggregate(types) {
     const mutation = `query($types: [UserItemType], $query: String, $start: Int, $count: Int) {
                     userItemsConnection (types: $types, query: $query, start: $start, count: $count) {
                         totalCount
@@ -354,7 +354,7 @@ export function payloadForAggregateRoles() {
                     }
                 }`;
     const variables = {
-        types: ["ROLE"]
+        types: types
     };
     return JSON.stringify({mutation, variables});
 }
