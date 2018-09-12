@@ -9,8 +9,8 @@ import * as utils from "./utils.js";
 
 export let options = {
     stages: [
-        {duration: "5s", target: "12"},
-        {duration: "5s", target: "12"},
+        {duration: "5s", target: "10"},
+        {duration: "15s", target: "10"},
         {duration: "5s", target: "0"}
     ],
     thresholds: {
@@ -45,7 +45,7 @@ const publishFolderMetric = new Trend("content_publish_folder");
 const publishContentMetric = new Trend("content_publish");
 const deleteFolderMetric = new Trend("content_delete_folder");
 
-function payloadForSuperHeroPost(name, displayName, testCounter, parentFolder, permissions) {
+function payloadForCreateSuperHeroPost(name, displayName, testCounter, parentFolder, permissions) {
     let payloadData = [
         {"name": "post", "type": "String", "values": [{"v": "<p>This is " + testCounter + " text!</p>\n"}]},
         {"name": "tags", "type": "String", "values": [{"v": "SH-" + testCounter}]},
@@ -63,6 +63,10 @@ function payloadForSuperHeroPost(name, displayName, testCounter, parentFolder, p
         body.permissions = permissions;
     }
     return JSON.stringify(body);
+}
+
+function payloadForUpdateSuperHeroPost(id, newContentName, newDisplayName, testCounter, permissions) {
+
 }
 
 function testUrl(url, payload, metric, contentType) {
@@ -92,7 +96,11 @@ function testUrl(url, payload, metric, contentType) {
 
     if (contentType === "application/json") {
         let body = JSON.parse(res.body);
-        console.log(body.id + ' / Name: ' + body.name);
+        if (typeof body.id !== 'undefined') {
+            console.log(body.id + ' / Name: ' + body.name);
+        } else {
+            console.log("Body: " + res.body);
+        }
         return body.id;
     }
 
@@ -108,7 +116,7 @@ function testUrl(url, payload, metric, contentType) {
     // }
 }
 
-function testUsersUrl(url, payload, metric) {
+function testUsersUrl(url, payload, metric, debug) {
     let res = '';
     let contentType = "application/json";
     if (payload == null) {
@@ -119,7 +127,9 @@ function testUsersUrl(url, payload, metric) {
         res = http.post(url, payload, {headers: {"Content-Type": contentType}});
     }
 
-    console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
+    if (typeof debug !== 'undefined') {
+        console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
+    }
 
     check(res, {
         "status is 200": (res) => res.status === 200,
@@ -129,10 +139,12 @@ function testUsersUrl(url, payload, metric) {
 
     let body = JSON.parse(res.body);
     if (body.authenticated === true) {
-        console.log("User is authenticated: " + body.user.displayName + " - E-mail:" + body.user.email);
+        if (typeof debug !== 'undefined') {
+            console.log("User is authenticated: " + body.user.displayName + " - E-mail:" + body.user.email);
+        }
         return true;
     } else {
-        console.log("Login failed");
+        console.log("Login failed: " + body);
         return false;
     }
 }
@@ -146,7 +158,7 @@ export default function () {
 
         // Get Image
         // testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");  // QA
-        testUrl(baseUrl + '/content/image/6f86f950-324f-46ef-ab59-e18f7ab76527?size=1258', null, getImageMetric, "image/jpeg");  // localhost
+        testUrl(baseUrl + '/content/image/be1ca151-cf61-4a54-9ea4-c8d01ce83e0e?size=1069', null, getImageMetric, "image/jpeg");  // localhost
         sleep(1);
 
         let testCounter = Math.floor((Math.random() * 1000000000) + 1);
@@ -166,7 +178,7 @@ export default function () {
 
         // Custom content:
         // Create
-        let contentId = testUrl(utils.createContentUrl(baseUrl), payloadForSuperHeroPost("post-" + testCounter, "Post-" + testCounter, testCounter, "/superhero/test/folder-" + testCounter), createContentMetric, "application/json");
+        let contentId = testUrl(utils.createContentUrl(baseUrl), payloadForCreateSuperHeroPost("post-" + testCounter, "Post-" + testCounter, testCounter, "/superhero/test/folder-" + testCounter), createContentMetric, "application/json");
         // Publish
         testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentId]), publishContentMetric, "application/json");
         sleep(1);
