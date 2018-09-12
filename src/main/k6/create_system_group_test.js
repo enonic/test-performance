@@ -30,19 +30,19 @@ const restUrl = 'http://127.0.0.1:8080/admin/rest';
 const createGroupMetric = new Trend("create_system_group");
 
 export default function () {
-    common.xp_login("su", "password", restUrl, true);
+    common.xp_login("su", "password", restUrl);
     group("create_system_group", function () {
 
         let displayName = 'group-' + Math.floor((Math.random() * 1000000000) + 1);
-        let res = common.createSystemGroup(baseUrl, displayName,true);
+        let res = common.createSystemGroup(baseUrl, displayName, true);
 
         check(res, {
             "status is 200": (res) => {
-                res.status === 200
+                return res.status === 200;
             },
             "content-type is application/json": (res) => res.headers['Content-Type'] === "application/json",
             "transaction time OK": (res) => {
-                res.timings.duration < 200;
+                return res.timings.duration < 200;
             }
         });
         createGroupMetric.add(res.timings.duration);

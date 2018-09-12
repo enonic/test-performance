@@ -45,11 +45,11 @@ export default function () {
         let respUpdate = common.updatePermissionsInUserStore(baseUrl, displayName,key,newPermissions,true);
         check(respUpdate, {
             "status is 200": (respUpdate) => {
-                respUpdate.status === 200
+               return respUpdate.status === 200;
             },
             "content-type is application/json": (resp) => resp.headers['Content-Type'] === "application/json",
             "transaction time OK": (resp) => {
-                resp.timings.duration < 300;
+               return resp.timings.duration < 700;
             }
         });
         updateUserStoreMetric.add(respUpdate.timings.duration);

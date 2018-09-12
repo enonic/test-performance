@@ -9,7 +9,7 @@ export let options = {
         {duration: "5s", target: "0"}
     ],
     thresholds: {
-        "delete_user_store": ["avg<300"],
+        "delete_user_store": ["avg<1000"],
         "failed requests": ["rate<0.1"],
         "http_req_duration": ["p(95)<10000", "avg<5000"],
         "http_req_connecting": ["max<3"]
@@ -35,17 +35,18 @@ export default function () {
 
         let displayName = 'store-' + Math.floor((Math.random() * 1000000000) + 1);
         let key = 'key-' + Math.floor((Math.random() * 1000000000) + 1);
-        common.createUserStore(baseUrl, displayName,key);
+        common.createUserStore(baseUrl, displayName, key);
         sleep(5);
         console.log("Store should be deleted :" + displayName);
-        let respDelete = common.deleteUserStore(baseUrl, key,true);
+        let respDelete = common.deleteUserStore(baseUrl, key, true);
         check(respDelete, {
             "status is 200": (respDelete) => {
-                respDelete.status === 200
+                return respDelete.status === 200;
             },
             "content-type is application/json": (resp) => resp.headers['Content-Type'] === "application/json",
             "transaction time OK": (resp) => {
-                resp.timings.duration < 300;
+                console.log('resp.timings.duration: ' + resp.timings.duration);
+                return resp.timings.duration < 1000;
             }
         });
         deleteUserStoreMetric.add(respDelete.timings.duration);

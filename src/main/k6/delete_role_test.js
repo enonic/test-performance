@@ -37,14 +37,14 @@ export default function () {
         common.createRole(baseUrl, displayName, true);
         sleep(5);
         console.log("Role should be deleted :" + displayName);
-        let respDelete = common.deleteRole(baseUrl, displayName,true);
+        let respDelete = common.deleteRole(baseUrl, displayName, true);
         check(respDelete, {
             "status is 200": (respDelete) => {
-                respDelete.status === 200
+                return respDelete.status === 200;
             },
             "content-type is application/json": (resp) => resp.headers['Content-Type'] === "application/json",
             "transaction time OK": (resp) => {
-                resp.timings.duration < 300;
+                return resp.timings.duration < 300;
             }
         });
         deleteRoleMetric.add(respDelete.timings.duration);

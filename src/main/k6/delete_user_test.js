@@ -38,14 +38,14 @@ export default function () {
         common.createUser(userName, email, 'password', baseUrl);
         sleep(5);
         console.log("User should be deleted :" + userName);
-        let respDelete = common.deleteUser(baseUrl,userName,true);
+        let respDelete = common.deleteUser(baseUrl, userName, true);
         check(respDelete, {
             "status is 200": (respDelete) => {
-                respDelete.status === 200
+                return respDelete.status === 200;
             },
             "content-type is application/json": (resp) => resp.headers['Content-Type'] === "application/json",
             "transaction time OK": (resp) => {
-                resp.timings.duration < 200;
+                return resp.timings.duration < 200;
             }
         });
         deleteUserMetric.add(respDelete.timings.duration);

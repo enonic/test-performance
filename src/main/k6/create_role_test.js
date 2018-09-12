@@ -41,11 +41,11 @@ export default function () {
         }
         check(res, {
             "status is 200": (res) => {
-                res.status === 200
+                return res.status === 200;
             },
             "content-type is application/json": (res) => res.headers['Content-Type'] === "application/json",
             "transaction time OK": (res) => {
-                res.timings.duration < 200;
+                return res.timings.duration < 200;
             }
         });
 

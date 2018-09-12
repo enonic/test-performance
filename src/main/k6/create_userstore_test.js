@@ -9,7 +9,7 @@ export let options = {
         {duration: "5s", target: "0"}
     ],
     thresholds: {
-        "create_user_store": ["avg<2000"],
+        "create_user_store": ["avg<7000"],
         "failed requests": ["rate<0.1"],
         "http_req_duration": ["p(95)<10000", "avg<5000"],
         "http_req_connecting": ["max<3"]
@@ -39,11 +39,11 @@ export default function () {
         let res = common.createUserStore(baseUrl, displayName, key, true);
         check(res, {
             "status is 200": (res) => {
-                res.status === 200
+                return res.status === 200;
             },
             "content-type is application/json": (res) => res.headers['Content-Type'] === "application/json",
             "transaction time OK": (res) => {
-                res.timings.duration < 200;
+                return res.timings.duration < 7000;
             }
         });
         createUserStoreMetric.add(res.timings.duration);

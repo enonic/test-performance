@@ -40,11 +40,11 @@ export default function () {
         let respDelete = common.deleteSystemGroup(baseUrl, displayName);
         check(respDelete, {
             "status is 200": (respDelete) => {
-                respDelete.status === 200
+                return respDelete.status === 200;
             },
             "content-type is application/json": (resp) => resp.headers['Content-Type'] === "application/json",
             "transaction time OK": (resp) => {
-                resp.timings.duration < 200;
+                return resp.timings.duration < 200;
             }
         });
         deleteGroupMetric.add(respDelete.timings.duration);

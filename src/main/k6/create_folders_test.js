@@ -1,5 +1,4 @@
 import {group, check, sleep} from "k6";
-import http from "k6/http";
 import {Trend} from "k6/metrics";
 import * as common from "./common.js";
 
@@ -34,7 +33,7 @@ export default function () {
     common.xp_login("su", "password", baseUrl, true);
     group("create_folder", function () {
 
-        var contentName = 'folder-' + Math.floor((Math.random() * 1000000000) + 1);
+        let contentName = 'folder-' + Math.floor((Math.random() * 1000000000) + 1);
         let res = common.createFolder(contentName, baseUrl, true);
         if (res.status === 200) {
             console.log("Content has been created, timings.duration is :" + res.timings.duration);
@@ -43,7 +42,7 @@ export default function () {
             "status is 200": (res) => res.status === 200,
             "content-type is application/json": (res) => res.headers['Content-Type'] === "application/json",
             "transaction time OK": (res) => {
-                res.timings.duration < 200;
+               return res.timings.duration < 200;
             }
         });
 

@@ -5,8 +5,8 @@ import * as common from "./common.js";
 
 export let options = {
     stages: [
-        {duration: "5s", target: "25"},
-        {duration: "10s", target: "25"},
+        {duration: "5s", target: "5"},
+        {duration: "10s", target: "5"},
         {duration: "5s", target: "0"}
     ],
     thresholds: {
@@ -40,15 +40,15 @@ export default function () {
         let email = userName + '@gmail.com';
         common.createUser(userName, email, 'password', baseUrl);
         sleep(7);
-        let updateResponse = common.addMembershipsToUser(baseUrl, userName, email, ['role:system.admin'],true);
+        let updateResponse = common.addMembershipsToUser(baseUrl, userName, email, ['role:system.admin'], true);
         check(updateResponse, {
             "status is 200": (updateResponse) => {
-                updateResponse.status === 200
+                return updateResponse.status === 200;
             },
             "content-type is application/json": (updateResponse) => updateResponse.headers['Content-Type'] === "application/json",
             "transaction time OK": (updateResponse) => {
-                console.log('updateResponse.timings.duration  '  + updateResponse.timings.duration);
-                updateResponse.timings.duration < 700;
+                console.log('updateResponse.timings.duration  ' + updateResponse.timings.duration);
+                return updateResponse.timings.duration < 700;
             }
         });
         updateUserMetric.add(updateResponse.timings.duration);

@@ -62,7 +62,7 @@ export default function () {
             "status is 200": (res2) => res2.status === 200,
             "content-type is application/json": (res2) => res2.headers['Content-Type'] === "application/json",
             "transaction time OK": (res2) => {
-                res2.timings.duration < 40;
+                return res2.timings.duration < 40;
             }
         });
 
