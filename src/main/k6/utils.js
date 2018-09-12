@@ -322,7 +322,7 @@ export function payloadForUpdateFolder(id, contentName, newDisplayName, permissi
 
 // payload for delete a 'offline'-folder
 export function payloadForDeleteContent(contentPaths) {
-    console.log("DEBUG: ##### PATH is :" + contentPaths[0]);
+    console.log("DEBUG (delete content): ##### PATH is :" + contentPaths[0]);
     let payload = {contentPaths: contentPaths, deleteOnline: false};
     return JSON.stringify(payload);
 }
@@ -361,4 +361,8 @@ export function storeWithPermissionsForEveryone() {
 
 
 
+}
+
+export function inheritPermissions() {
+    return {"inheritPermissions": true};
 }
