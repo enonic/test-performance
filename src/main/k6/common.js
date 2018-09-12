@@ -33,7 +33,7 @@ export function createUser(name, email, password, baseUrl, debug) {
     return res;
 }
 
-export function deleteUser(baseUrl, displayName,debug) {
+export function deleteUser(baseUrl, displayName, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteSystemUser(displayName);
     let res = http.post(url, payload, utils.defaultParams());
@@ -52,6 +52,7 @@ export function createRole(baseUrl, displayName, debug) {
     }
     return res;
 }
+
 export function deleteRole(baseUrl, displayName, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteRole(displayName);
@@ -141,4 +142,16 @@ export function addMembershipsToUser(baseUrl, displayName, email, memberships, d
     }
     return res;
 }
+
+export function aggregateRoles(baseUrl, debug) {
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForAggregateRoles();
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        let body = JSON.parse(res.body);
+        console.log("Aggregate Roles action: status=" + String(res.status) + "  totalCount=" + body.data.userItemsConnection.totalCount);
+    }
+    return res;
+}
+
 

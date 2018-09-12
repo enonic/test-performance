@@ -332,6 +332,33 @@ export function payloadForPublishContent(ids) {
     return JSON.stringify(body);
 }
 
+export function payloadForAggregateRoles() {
+    const mutation = `query($types: [UserItemType], $query: String, $start: Int, $count: Int) {
+                    userItemsConnection (types: $types, query: $query, start: $start, count: $count) {
+                        totalCount
+                        edges {
+                            node {
+                                key,
+                                name,
+                                description,
+                                displayName
+                            }
+                        }
+                        aggregations {
+                            name,
+                            buckets {
+                                key,
+                                docCount
+                            }
+                        }
+                    }
+                }`;
+    const variables = {
+        types: ["ROLE"]
+    };
+    return JSON.stringify({mutation, variables});
+}
+
 // create Full Access permissions for Anonymous User
 export function anonymousPermissions() {
     return [
@@ -354,11 +381,10 @@ export function anonymousPermissions() {
 //return array of default permissions + permissions for everyone
 export function storeWithPermissionsForEveryone() {
     return [{principal: "role:system.authenticated", access: "READ"},
-            {principal: "role:system.admin", access: "ADMINISTRATOR"},
-            {principal: "role:system.user.admin", access: "ADMINISTRATOR"},
-            {principal: "role:system.everyone", access: "CREATE_USERS"}
-        ]
-
+        {principal: "role:system.admin", access: "ADMINISTRATOR"},
+        {principal: "role:system.user.admin", access: "ADMINISTRATOR"},
+        {principal: "role:system.everyone", access: "CREATE_USERS"}
+    ]
 
 
 }
