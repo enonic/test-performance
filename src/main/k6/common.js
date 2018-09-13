@@ -13,6 +13,26 @@ export function xp_login(username, password, baseUrl, debug) {
     return res;
 }
 
+export function installApp(baseUrl, appUrl, debug) {
+    let url = utils.installAppUrl(baseUrl);
+    let payload = utils.payloadForInstallApp(appUrl);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Install application: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
+
+export function uninstallApp(baseUrl, key, debug) {
+    let url = utils.uninstallAppUrl(baseUrl);
+    let payload = utils.payloadForUninstallApp(key);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        console.log("Uninstall application: status=" + String(res.status) + "  Body=" + res.body);
+    }
+    return res;
+}
+
 export function createFolder(name, baseUrl, debug) {
     let url = utils.createContentUrl(baseUrl);
     let payload = utils.payloadForCreateRootFolder(name, "My folder");
@@ -167,11 +187,12 @@ export function filterItemsByName(baseUrl, name, debug) {
 
 export function aggregateRolesAndUsers(baseUrl, debug) {
     let url = utils.userUrl(baseUrl);
-    let payload = utils.payloadForAggregate( ["ROLE", "USER"]);
+    let payload = utils.payloadForAggregate(["ROLE", "USER"]);
     let res = http.post(url, payload, utils.defaultParams());
     if (typeof debug !== 'undefined') {
         let body = JSON.parse(res.body);
-        console.log("Aggregate Roles and Users action: status=" + String(res.status) + "  totalCount=" + body.data.userItemsConnection.totalCount);
+        console.log("Aggregate Roles and Users action: status=" + String(res.status) + "  totalCount=" +
+                    body.data.userItemsConnection.totalCount);
     }
     return res;
 }

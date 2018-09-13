@@ -10,6 +10,12 @@ export function createContentUrl(baseUrl) {
     return baseUrl + '/content/create/';
 }
 
+export function installAppUrl(baseUrl) {
+    return baseUrl + '/application/installUrl';
+}
+export function uninstallAppUrl(baseUrl) {
+    return baseUrl + '/application/uninstall';
+}
 export function updateContentUrl(baseUrl) {
     return baseUrl + '/content/update/';
 }
@@ -33,6 +39,15 @@ export function defaultParams() {
 export function payloadForLogin(username, password) {
     let payload = {user: username, password: password};
     return JSON.stringify(payload);
+}
+
+export function payloadForInstallApp(url) {
+    let body = {URL: url};
+    return JSON.stringify(body);
+}
+export function payloadForUninstallApp(key) {
+    let body = {key: key};
+    return JSON.stringify(body);
 }
 
 // creates a JSON string for the request's body for creating new folder in root directory
