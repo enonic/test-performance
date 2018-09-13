@@ -16,8 +16,8 @@ export let options = {
     },
     ext: {
         loadimpact: {
-            projectID: 3114691,
-            name: "User Store - Add permissions for everyone",
+            projectID: 3114692,
+            name: "Filtering of user item",
             distribution: {
                 scenarioLabel1: {loadZone: "amazon:kr:seoul", percent: 50},
                 scenarioLabel2: {loadZone: "amazon:ie:dublin", percent: 50}
