@@ -154,6 +154,17 @@ export function aggregateRoles(baseUrl, debug) {
     return res;
 }
 
+export function filterItemsByName(baseUrl, name, debug) {
+    let url = utils.userUrl(baseUrl);
+    let payload = utils.payloadForFilterUserItems(name);
+    let res = http.post(url, payload, utils.defaultParams());
+    if (typeof debug !== 'undefined') {
+        let body = JSON.parse(res.body);
+        console.log("Filter user items action: status=" + String(res.status) + "  totalCount=" + body.data.userItemsConnection.totalCount);
+    }
+    return res;
+}
+
 export function aggregateRolesAndUsers(baseUrl, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForAggregate( ["ROLE", "USER"]);

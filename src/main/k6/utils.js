@@ -332,6 +332,34 @@ export function payloadForPublishContent(ids) {
     return JSON.stringify(body);
 }
 
+export function payloadForFilterUserItems(query) {
+    const mutation = `query($types: [UserItemType], $query: String, $start: Int, $count: Int) {
+                    userItemsConnection (types: $types, query: $query, start: $start, count: $count) {
+                        totalCount
+                        edges {
+                            node {
+                                key,
+                                name,
+                                description,
+                                displayName
+                            }
+                        }
+                        aggregations {
+                            name,
+                            buckets {
+                                key,
+                                docCount
+                            }
+                        }
+                    }
+                }`;
+    const variables = {
+        query: query
+    };
+    return JSON.stringify({mutation, variables});
+}
+
+
 export function payloadForAggregate(types) {
     const mutation = `query($types: [UserItemType], $query: String, $start: Int, $count: Int) {
                     userItemsConnection (types: $types, query: $query, start: $start, count: $count) {
