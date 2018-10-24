@@ -9,9 +9,9 @@ import * as utils from "./utils.js";
 
 export let options = {
     stages: [
-        {duration: "5s", target: "10"},
-        // {duration: "5s", target: "10"},
-        {duration: "5s", target: "0"}
+        {duration: "20s", target: "200"},
+        {duration: "200s", target: "200"},
+        {duration: "20s", target: "0"}
     ],
     thresholds: {
         "content_get": ["avg<30"],
@@ -26,7 +26,7 @@ export let options = {
             name: "K6 performance research",
             distribution: {
                 scenarioLabel1: {loadZone: "amazon:sg:singapore", percent: 50},
-                scenarioLabel2: {loadZone: "amazon:gb:london", percent: 50}
+                scenarioLabel2: {loadZone: "amazon:us:ashburn", percent: 50}
             }
         }
     }
