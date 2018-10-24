@@ -1,16 +1,16 @@
 // This test requires Superhero app to be installed, and that a folder "Test" is placed in the root of the Superhero structure.
 // All actions are done inside the /superhero/test folder.
+// Also, the test logs in to the admin console as "pt@enonic.com".  Make sure this user exist with the right password.
 
 import {check, group, sleep} from "k6";
 import http from "k6/http";
 import {Trend} from "k6/metrics";
-// import * as common from "./common.js";
 import * as utils from "./utils.js";
 
 export let options = {
     stages: [
         {duration: "5s", target: "10"},
-        {duration: "15s", target: "10"},
+        // {duration: "5s", target: "10"},
         {duration: "5s", target: "0"}
     ],
     thresholds: {
@@ -18,22 +18,22 @@ export let options = {
         "content_image": ["avg<50"],
         "create_folder": ["avg<70"],
         "http_req_duration": ["p(95)<10000", "avg<5000"],
-        "http_req_connecting": ["max<3"]
+        "http_req_connecting": ["max<25"]
     },
     ext: {
         loadimpact: {
             projectID: 3114611,
             name: "K6 performance research",
             distribution: {
-                scenarioLabel1: {loadZone: "amazon:kr:seoul", percent: 50},
-                scenarioLabel2: {loadZone: "amazon:ie:dublin", percent: 50}
+                scenarioLabel1: {loadZone: "amazon:sg:singapore", percent: 50},
+                scenarioLabel2: {loadZone: "amazon:gb:london", percent: 50}
             }
         }
     }
 };
 
 // const baseUrl = 'https://qa.enonic.com/admin/rest';
-const baseUrl = 'http://127.0.0.1:8080/admin/rest';
+const baseUrl = 'https://cluster-test.enonic.cloud/admin/rest';
 const loginMetric = new Trend("auth_login");
 const isAuthenticatedMetric = new Trend("auth_authenticated");
 const getImageMetric = new Trend("content_get_image");
@@ -69,7 +69,7 @@ function payloadForUpdateSuperHeroPost(id, newContentName, newDisplayName, testC
 
 }
 
-function testUrl(url, payload, metric, contentType) {
+function testUrl(url, payload, metric, contentType, debug) {
     let res = '';
     if (payload == null) {
         console.log('GET: ' + url);
@@ -85,14 +85,29 @@ function testUrl(url, payload, metric, contentType) {
     });
     metric.add(res.timings.duration);
 
-    if (res.status === 200) {
-        console.log("Response status: " + res.status);
-    } else {
-        console.log("Response error: " + res.status);
-        console.log(" - with url: " + url);
-        console.log(" - with payload: " + payload);
-        console.log(" - with response: " + res.body);
+    if (typeof debug !== 'undefined') {
+        if (res.status === 200) {
+            console.log("Response status: " + res.status);
+            // console.log("Proto: " + res.proto);
+            // console.log("Subproto: " + res.subproto);
+            // console.log("Method: " + res.method);
+            // console.log("Url: " + res.url);
+            // console.log("Name: " + res.name);
+            // console.log("Group: " + res.group);
+            // console.log("Check: " + res.check);
+            // console.log("Error: " + res.error);
+            // console.log("TLS_version: " + res.tls_version);
+            console.log("VU: " + __VU);
+            console.log("Iteration no: " + __ITER);
+            // console.log(`VU: ${__VU}  -  ITER: ${__ITER}`);
+        } else {
+            console.log("Response error: " + res.status);
+            console.log(" - with url: " + url);
+            console.log(" - with payload: " + payload);
+            console.log(" - with response: " + res.body);
+        }
     }
+
 
     if (contentType === "application/json") {
         let body = JSON.parse(res.body);
@@ -141,6 +156,7 @@ function testUsersUrl(url, payload, metric, debug) {
     if (body.authenticated === true) {
         if (typeof debug !== 'undefined') {
             console.log("User is authenticated: " + body.user.displayName + " - E-mail:" + body.user.email);
+            // console.log("Body: " + res.body);
         }
         return true;
     } else {
@@ -150,7 +166,7 @@ function testUsersUrl(url, payload, metric, debug) {
 }
 
 export default function () {
-    testUsersUrl(utils.loginUrl(baseUrl), utils.payloadForLogin("pt@enonic.com", "PTpt123"), loginMetric);
+    testUsersUrl(utils.loginUrl(baseUrl), utils.payloadForLogin("pt@enonic.com", "PTpt124#tp"), loginMetric);
 
     group("test_contentstudio", function () {
         // Verify that user is authenticated:
@@ -158,7 +174,8 @@ export default function () {
 
         // Get Image
         // testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");  // QA
-        testUrl(baseUrl + '/content/image/be1ca151-cf61-4a54-9ea4-c8d01ce83e0e?size=1069', null, getImageMetric, "image/jpeg");  // localhost
+        // testUrl(baseUrl + '/content/image/be1ca151-cf61-4a54-9ea4-c8d01ce83e0e?size=1069', null, getImageMetric, "image/jpeg");  // localhost
+        testUrl(baseUrl + '/content/image/098a6549-9fe7-4027-8756-f7fd4254e43a?size=1069', null, getImageMetric, "image/jpeg");  // cluster-test.enonic.cloud
         sleep(1);
 
         let testCounter = Math.floor((Math.random() * 1000000000) + 1);
@@ -167,11 +184,10 @@ export default function () {
         // Create
         let contentFolderId = testUrl(utils.createContentUrl(baseUrl), JSON.stringify({data: [], meta: [], displayName: "New Folder", parent: '/superhero/test', name: 'folder-' + testCounter, contentType: "base:folder", requireValid: false}), createFolderMetric, "application/json");
         // Get
-        testUrl(baseUrl + '/content?id=' + contentFolderId, null, getContentMetric, "application/json" );
+        testUrl(baseUrl + '/content?id=' + contentFolderId, null, getContentMetric, "application/json", true );
         sleep(1);
         // Update
         testUrl(utils.updateContentUrl(baseUrl), utils.payloadForUpdateFolder(contentFolderId, 'folder-' + testCounter, 'Folder no: ' + testCounter, utils.anonymousPermissions()), updateFolderMetric, "application/json");
-        sleep(1);
         // Publish
         testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentFolderId]), publishFolderMetric, "application/json");
         sleep(1);
