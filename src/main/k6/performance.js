@@ -16,7 +16,7 @@ export let options = {
         "content_get": ["avg<30"],
         "content_image": ["avg<50"],
         "create_folder": ["avg<70"],
-        "http_req_duration": ["p(95)<10000", "avg<5000"],
+        "http_req_duration": ["p(95)<4000", "avg<2000"],
         "http_req_connecting": ["max<25"]
     },
     ext: {
