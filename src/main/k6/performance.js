@@ -9,14 +9,14 @@ import * as utils from "./utils.js";
 
 export let options = {
     stages: [
-        {duration: "100s", target: "200"},
+        {duration: "220s", target: "500"},
         {duration: "20s", target: "0"}
     ],
     thresholds: {
         "content_get": ["avg<30"],
         "content_image": ["avg<50"],
         "create_folder": ["avg<70"],
-        "http_req_duration": ["p(95)<5000", "avg<3000"],
+        "http_req_duration": ["p(95)<10000", "avg<5000"],
         "http_req_connecting": ["max<25"]
     },
     ext: {
