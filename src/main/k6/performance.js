@@ -175,34 +175,72 @@ export default function () {
         // testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");  // QA
         // testUrl(baseUrl + '/content/image/be1ca151-cf61-4a54-9ea4-c8d01ce83e0e?size=1069', null, getImageMetric, "image/jpeg");  // localhost
         testUrl(baseUrl + '/content/image/098a6549-9fe7-4027-8756-f7fd4254e43a?size=1069', null, getImageMetric, "image/jpeg");  // cluster-test.enonic.cloud
-        sleep(1);
 
         let testCounter = Math.floor((Math.random() * 1000000000) + 1);
+        let contentFolderId = "0";
+        let contentId = "0";
 
         // Folder:
         // Create
-        let contentFolderId = testUrl(utils.createContentUrl(baseUrl), JSON.stringify({data: [], meta: [], displayName: "New Folder", parent: '/superhero/test', name: 'folder-' + testCounter, contentType: "base:folder", requireValid: false}), createFolderMetric, "application/json");
-        // Get
-        testUrl(baseUrl + '/content?id=' + contentFolderId, null, getContentMetric, "application/json", true );
+        group("create-folder", function() {
+            contentFolderId = testUrl(utils.createContentUrl(baseUrl), JSON.stringify({
+                data: [],
+                meta: [],
+                displayName: "New Folder",
+                parent: '/superhero/test',
+                name: 'folder-' + testCounter,
+                contentType: "base:folder",
+                requireValid: false
+            }), createFolderMetric, "application/json");
+        });
         sleep(1);
+
+        // Get
+        group("verify-folder", function() {
+            testUrl(baseUrl + '/content?id=' + contentFolderId, null, getContentMetric, "application/json", true);
+        });
+
         // Update
-        testUrl(utils.updateContentUrl(baseUrl), utils.payloadForUpdateFolder(contentFolderId, 'folder-' + testCounter, 'Folder no: ' + testCounter, utils.anonymousPermissions()), updateFolderMetric, "application/json");
+        group("update-folder", function() {
+            testUrl(utils.updateContentUrl(baseUrl),
+                utils.payloadForUpdateFolder(contentFolderId, 'folder-' + testCounter, 'Folder no: ' + testCounter,
+                    utils.anonymousPermissions()), updateFolderMetric, "application/json");
+        });
+        sleep(1);
+
         // Publish
-        testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentFolderId]), publishFolderMetric, "application/json");
+        group("publish-folder", function() {
+            testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentFolderId]), publishFolderMetric, "application/json");
+        });
         sleep(1);
 
         // Custom content:
         // Create
-        let contentId = testUrl(utils.createContentUrl(baseUrl), payloadForCreateSuperHeroPost("post-" + testCounter, "Post-" + testCounter, testCounter, "/superhero/test/folder-" + testCounter), createContentMetric, "application/json");
-        // Publish
-        testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentId]), publishContentMetric, "application/json");
+        group("create-content", function () {
+            contentId = testUrl(utils.createContentUrl(baseUrl), payloadForCreateSuperHeroPost("post-" + testCounter, "Post-" + testCounter, testCounter, "/superhero/test/folder-" + testCounter), createContentMetric, "application/json");
+        });
         sleep(1);
 
+        // Publish custom content
+        group("publish-content", function () {
+            testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentId]), publishContentMetric, "application/json");
+        });
+        sleep(1);
+
+        // Binary content:
         // Upload Image to folder
 
-        testUrl(utils.deleteContentUrl(baseUrl), utils.payloadForDeleteContent(["/superhero/test/folder-" + testCounter]), deleteFolderMetric, "application/json");
+        // Publish
+
+        // Delete all:
+        group("delete-folder-with-content", function () {
+            testUrl(utils.deleteContentUrl(baseUrl), utils.payloadForDeleteContent(["/superhero/test/folder-" + testCounter]), deleteFolderMetric, "application/json");
+        });
         sleep(1);
-        testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentFolderId]), publishFolderMetric, "application/json");
+
+        group("publish-delete", function () {
+            testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentFolderId]), publishFolderMetric, "application/json");
+        });
         sleep(1);
     });
 
