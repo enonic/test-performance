@@ -9,8 +9,9 @@ import * as utils from "./utils.js";
 
 export let options = {
     stages: [
-        {duration: "220s", target: "200"},
-        {duration: "20s", target: "0"}
+        {duration: "180s", target: "200"},
+        {duration: "240s", target: "250"},
+        {duration: "30s", target: "0"}
     ],
     thresholds: {
         "content_get": ["avg<30"],
