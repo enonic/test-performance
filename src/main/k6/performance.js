@@ -9,16 +9,16 @@ import * as utils from "./utils.js";
 
 export let options = {
     stages: [
-        {duration: "180s", target: "200"},
-        {duration: "240s", target: "250"},
-        {duration: "30s", target: "0"}
+        {duration: "20s", target: "120"},
+        {duration: "60s", target: "150"},
+        {duration: "20s", target: "0"}
     ],
     thresholds: {
-        "content_get": ["avg<30"],
-        "content_image": ["avg<50"],
-        "create_folder": ["avg<70"],
-        "http_req_duration": ["p(95)<12000", "avg<5000"],
-        "http_req_connecting": ["max<25"]
+        "content_get": ["avg<3"],
+        "content_image": ["avg<5"],
+        "content_create": ["avg<15", "p(95)<20"],
+        "http_req_duration": ["p(95)<500", "avg<100"],
+        "http_req_connecting": ["max<5"]
     },
     ext: {
         loadimpact: {
@@ -33,41 +33,21 @@ export let options = {
 };
 
 // const baseUrl = 'https://qa.enonic.com/admin/rest';
-const baseUrl = 'https://cluster-test.enonic.cloud/admin/rest';
+// const baseUrl = 'https://cluster-test.enonic.cloud/admin/rest';
+// const baseUrl = 'https://nightly.enonic.net/admin/rest';
+const baseUrl = 'http://127.0.0.1:8080/admin/rest';
 const loginMetric = new Trend("auth_login");
 const isAuthenticatedMetric = new Trend("auth_authenticated");
 const getImageMetric = new Trend("content_get_image");
 const getContentMetric = new Trend("content_get_folder");
 const createFolderMetric = new Trend("content_create_folder");
 const createContentMetric = new Trend("content_create");
+const createImageMetric = new Trend("image_create");
 const updateFolderMetric = new Trend("content_update_folder");
 const publishFolderMetric = new Trend("content_publish_folder");
 const publishContentMetric = new Trend("content_publish");
+const publishImageMetric = new Trend("image_publish");
 const deleteFolderMetric = new Trend("content_delete_folder");
-
-function payloadForCreateSuperHeroPost(name, displayName, testCounter, parentFolder, permissions) {
-    let payloadData = [
-        {"name": "post", "type": "String", "values": [{"v": "<p>This is " + testCounter + " text!</p>\n"}]},
-        {"name": "tags", "type": "String", "values": [{"v": "SH-" + testCounter}]},
-        {"name": "enableComments", "type": "Boolean", "values": [{"v": true}]},
-        {"name": "stickyPost", "type": "Boolean", "values": [{"v": true}]},
-        {"name": "slideshow","type": "Boolean","values": [{"v": false}]}
-    ];
-    let payloadMeta = [
-        {
-            "data": [{"name": "menuItem", "type": "Boolean", "values": [{"v": false}]}, {"name": "menuName", "type": "String", "values": [{}]}],
-            "name": "com.enonic.app.superhero:menu-item"
-        }];
-    let body = {data: payloadData, meta: payloadMeta, displayName: displayName, parent: parentFolder, name: name, contentType: "com.enonic.app.superhero:post", requireValid: false};
-    if (permissions != undefined) {
-        body.permissions = permissions;
-    }
-    return JSON.stringify(body);
-}
-
-function payloadForUpdateSuperHeroPost(id, newContentName, newDisplayName, testCounter, permissions) {
-
-}
 
 function testUrl(url, payload, metric, contentType, debug) {
     let res = '';
@@ -138,7 +118,7 @@ function testUsersUrl(url, payload, metric, debug) {
         console.log('GET: ' + url);
         res = http.get(url);
     } else {
-        console.log('POST: ' + url);
+        console.log('POST: ' + url + ' with payload: ' + payload);
         res = http.post(url, payload, {headers: {"Content-Type": contentType}});
     }
 
@@ -167,6 +147,7 @@ function testUsersUrl(url, payload, metric, debug) {
 
 export default function () {
     testUsersUrl(utils.loginUrl(baseUrl), utils.payloadForLogin("pt@enonic.com", "PTpt124#tp"), loginMetric);
+    console.log("Logged in");
 
     group("test_contentstudio", function () {
         // Verify that user is authenticated:
@@ -174,12 +155,13 @@ export default function () {
 
         // Get Image
         // testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");  // QA
-        // testUrl(baseUrl + '/content/image/be1ca151-cf61-4a54-9ea4-c8d01ce83e0e?size=1069', null, getImageMetric, "image/jpeg");  // localhost
-        testUrl(baseUrl + '/content/image/098a6549-9fe7-4027-8756-f7fd4254e43a?size=1069', null, getImageMetric, "image/jpeg");  // cluster-test.enonic.cloud
+        testUrl(baseUrl + '/content/image/be1ca151-cf61-4a54-9ea4-c8d01ce83e0e?size=1069', null, getImageMetric, "image/jpeg");  // localhost / nightly
+        // testUrl(baseUrl + '/content/image/098a6549-9fe7-4027-8756-f7fd4254e43a?size=1069', null, getImageMetric, "image/jpeg");  // cluster-test.enonic.cloud
 
         let testCounter = Math.floor((Math.random() * 1000000000) + 1);
         let contentFolderId = "0";
         let contentId = "0";
+        let contentImageId = "0";
 
         // Folder:
         // Create
@@ -218,7 +200,7 @@ export default function () {
         // Custom content:
         // Create
         group("create-content", function () {
-            contentId = testUrl(utils.createContentUrl(baseUrl), payloadForCreateSuperHeroPost("post-" + testCounter, "Post-" + testCounter, testCounter, "/superhero/test/folder-" + testCounter), createContentMetric, "application/json");
+            contentId = testUrl(utils.createContentUrl(baseUrl), utils.payloadForCreateSuperHeroPost("post-" + testCounter, "Post-" + testCounter, testCounter, "/superhero/test/folder-" + testCounter), createContentMetric, "application/json");
         });
         sleep(1);
 
@@ -228,11 +210,18 @@ export default function () {
         });
         sleep(1);
 
-        // Binary content:
-        // Upload Image to folder
-
-        // Publish
-
+        // group("create-image", function () {
+        //     // Upload Image to folder
+        //     contentImageId = testUrl(utils.createContentUrl(baseUrl), utils.payloadForCreateImage( "image-" + testCounter, "Image-" + testCounter, testCounter, "/superhero/test/folder-" + testCounter ), createImageMetric, "application/json")
+        // });
+        // sleep(1);
+        //
+        // // Publish custom content
+        // group("publish-image", function () {
+        //     testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentImageId]), publishImageMetric, "application/json");
+        // });
+        // sleep(1);
+        //
         // Delete all:
         group("delete-folder-with-content", function () {
             testUrl(utils.deleteContentUrl(baseUrl), utils.payloadForDeleteContent(["/superhero/test/folder-" + testCounter]), deleteFolderMetric, "application/json");

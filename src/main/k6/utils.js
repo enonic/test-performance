@@ -119,6 +119,35 @@ export function payloadForCreateRole(displayName) {
     return JSON.stringify({mutation, variables});
 }
 
+export function payloadForCreateImage(name, displayName, testCounter, parentFolder, permissions) {
+
+}
+
+export function payloadForCreateSuperHeroPost(name, displayName, testCounter, parentFolder, permissions) {
+    console.log('Starting payloadForCreateSuperHeroPost()');
+    let payloadData = [
+        {"name": "post", "type": "String", "values": [{"v": "<p>This is " + testCounter + " text!</p>\n"}]},
+        {"name": "tags", "type": "String", "values": [{"v": "SH-" + testCounter}]},
+        {"name": "enableComments", "type": "Boolean", "values": [{"v": true}]},
+        {"name": "stickyPost", "type": "Boolean", "values": [{"v": false}]},
+        {"name": "slideshow", "type": "Boolean","values": [{"v": true}]},
+        {"name": "author", "type": "Reference", "values": [{"v": "22354f06-b64e-48d8-959d-da5f8c27a424"}]},
+        {"name": "category", "type": "Reference", "values": [{"v": "e656bc02-10dd-45b1-b30f-c9deef28aa6f"}, {"v": "11b7c8c5-5633-47d3-a488-9c4d5060b690"}]}
+    ];
+    // let payloadMeta = [
+    //     {
+    //         "data": [{"name": "menuItem", "type": "Boolean", "values": [{"v": false}]}, {"name": "menuName", "type": "String", "values": [{}]}],
+    //         "name": "com.enonic.app.superhero:menu-item"
+    //     }];
+    let payloadMeta = [];
+    let body = {data: payloadData, meta: payloadMeta, displayName: displayName, parent: parentFolder, name: name, contentType: "com.enonic.app.superhero:post", requireValid: false};
+    if (permissions != undefined) {
+        body.permissions = permissions;
+    }
+    console.log('SuperHero payload: ' + JSON.stringify(body));
+    return JSON.stringify(body);
+}
+
 export function payloadForDeleteRole(displayName) {
     const mutation = `mutation ($keys: [String]!) {
             deletePrincipals(keys: $keys) {
