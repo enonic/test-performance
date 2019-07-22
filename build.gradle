@@ -87,7 +87,7 @@ task startServer( dependsOn: [unpackDistro, deployContentStudio] ) {
         // logging.captureStandardOutput LogLevel.INFO
         // ext.xpServer = new ServerInstance()
         xpServer.installDir = file( distroDir )
-        xpServer.startupDelay = 40000
+        xpServer.startupDelay = 10000
         xpServer.start()
     }
     deployContentStudio.mustRunAfter unpackDistro
