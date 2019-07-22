@@ -124,7 +124,6 @@ export function payloadForCreateImage(name, displayName, testCounter, parentFold
 }
 
 export function payloadForCreateSuperHeroPost(name, displayName, testCounter, parentFolder, permissions) {
-    console.log('Starting payloadForCreateSuperHeroPost()');
     let payloadData = [
         {"name": "post", "type": "String", "values": [{"v": "<p>This is " + testCounter + " text!</p>\n"}]},
         {"name": "tags", "type": "String", "values": [{"v": "SH-" + testCounter}]},
@@ -144,7 +143,7 @@ export function payloadForCreateSuperHeroPost(name, displayName, testCounter, pa
     if (permissions != undefined) {
         body.permissions = permissions;
     }
-    console.log('SuperHero payload: ' + JSON.stringify(body));
+    // console.log('SuperHero payload: ' + JSON.stringify(body));
     return JSON.stringify(body);
 }
 
@@ -366,7 +365,7 @@ export function payloadForUpdateFolder(id, contentName, newDisplayName, permissi
 
 // payload for delete a 'offline'-folder
 export function payloadForDeleteContent(contentPaths) {
-    console.log("DEBUG (delete content): ##### PATH is :" + contentPaths[0]);
+    // console.log("DEBUG (delete content): ##### PATH is :" + contentPaths[0]);
     let payload = {contentPaths: contentPaths, deleteOnline: false};
     return JSON.stringify(payload);
 }

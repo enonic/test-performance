@@ -14,9 +14,9 @@ export let options = {
         {duration: "20s", target: "0"}
     ],
     thresholds: {
-        "content_get": ["avg<3"],
-        "content_image": ["avg<5"],
-        "content_create": ["avg<15", "p(95)<20"],
+        "auth_authenticated": ["avg<2", "p(95)<3"],
+        "content_get_image": ["avg<20", "p(95)<50"],
+        // "content_create": ["avg<300", "p(90)<500"],
         "http_req_duration": ["p(95)<500", "avg<100"],
         "http_req_connecting": ["max<5"]
     },
@@ -52,10 +52,10 @@ const deleteFolderMetric = new Trend("content_delete_folder");
 function testUrl(url, payload, metric, contentType, debug) {
     let res = '';
     if (payload == null) {
-        console.log('GET: ' + url);
+        // console.log('GET: ' + url);
         res = http.get(url);
     } else {
-        console.log('POST: ' + url);
+        // console.log('POST: ' + url);
         res = http.post(url, payload, {headers: {"Content-Type": "application/json"}});
     }
 
@@ -67,7 +67,7 @@ function testUrl(url, payload, metric, contentType, debug) {
 
     if (typeof debug !== 'undefined') {
         if (res.status === 200) {
-            console.log("Response status: " + res.status);
+            // console.log("Response status: " + res.status);
             // console.log("Proto: " + res.proto);
             // console.log("Subproto: " + res.subproto);
             // console.log("Method: " + res.method);
@@ -77,8 +77,8 @@ function testUrl(url, payload, metric, contentType, debug) {
             // console.log("Check: " + res.check);
             // console.log("Error: " + res.error);
             // console.log("TLS_version: " + res.tls_version);
-            console.log("VU: " + __VU);
-            console.log("Iteration no: " + __ITER);
+            // console.log("VU: " + __VU);
+            // console.log("Iteration no: " + __ITER);
             // console.log(`VU: ${__VU}  -  ITER: ${__ITER}`);
         } else {
             console.log("Response error: " + res.status);
@@ -92,9 +92,9 @@ function testUrl(url, payload, metric, contentType, debug) {
     if (contentType === "application/json") {
         let body = JSON.parse(res.body);
         if (typeof body.id !== 'undefined') {
-            console.log(body.id + ' / Name: ' + body.name);
+            // console.log(body.id + ' / Name: ' + body.name);
         } else {
-            console.log("Body: " + res.body);
+            // console.log("Body: " + res.body);
         }
         return body.id;
     }
@@ -115,15 +115,15 @@ function testUsersUrl(url, payload, metric, debug) {
     let res = '';
     let contentType = "application/json";
     if (payload == null) {
-        console.log('GET: ' + url);
+        // console.log('GET: ' + url);
         res = http.get(url);
     } else {
-        console.log('POST: ' + url + ' with payload: ' + payload);
+        // console.log('POST: ' + url + ' with payload: ' + payload);
         res = http.post(url, payload, {headers: {"Content-Type": contentType}});
     }
 
     if (typeof debug !== 'undefined') {
-        console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
+        // console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
     }
 
     check(res, {
@@ -135,7 +135,7 @@ function testUsersUrl(url, payload, metric, debug) {
     let body = JSON.parse(res.body);
     if (body.authenticated === true) {
         if (typeof debug !== 'undefined') {
-            console.log("User is authenticated: " + body.user.displayName + " - E-mail:" + body.user.email);
+            // console.log("User is authenticated: " + body.user.displayName + " - E-mail:" + body.user.email);
             // console.log("Body: " + res.body);
         }
         return true;
@@ -147,7 +147,7 @@ function testUsersUrl(url, payload, metric, debug) {
 
 export default function () {
     testUsersUrl(utils.loginUrl(baseUrl), utils.payloadForLogin("pt@enonic.com", "PTpt124#tp"), loginMetric);
-    console.log("Logged in");
+    // console.log("Logged in");
 
     group("test_contentstudio", function () {
         // Verify that user is authenticated:

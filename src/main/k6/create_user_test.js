@@ -4,9 +4,9 @@ import * as common from "./common.js";
 
 export let options = {
     stages: [
-        {duration: "5s", target: "5"},
-        {duration: "10s", target: "5"},
-        {duration: "5s", target: "0"}
+        {duration: "5s", target: "2"},
+        {duration: "10s", target: "2"},
+        {duration: "2s", target: "0"}
     ],
     thresholds: {
         "user_create": ["avg<200"],

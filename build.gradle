@@ -37,7 +37,8 @@ ext {
     distroDir = "$unpackDir${File.separator}enonic-xp-generic-$xpVersion"
     deployDir = "$distroDir${File.separator}home${File.separator}deploy"
     xpHome = "$distroDir${File.separator}home"
-    configDir = "$xpHome${File.separator}config"
+//    configDir = "$xpHome${File.separator}config"
+    appDir = "$projectDir${File.separator}test-applications"
     contentStudioFile = "$deployDir${File.separator}contentstudio-${csVersion}.jar"
     contentStudioAppUrl = "https://repo.enonic.com/public/com/enonic/app/contentstudio/${csVersion}/contentstudio-${csVersion}.jar"
     xpServer = new ServerInstance()
@@ -52,6 +53,13 @@ dependencies {
 //    compile 'org.spockframework:spock-core:1.1-groovy-2.4'
 //    compile 'org.gebish:geb-spock:2.1'
     testPerformance "com.enonic.xp:enonic-xp-generic:$xpVersion@zip"
+}
+
+task unpackDistro( type: Copy ) {
+    from {
+        configurations.testPerformance.collect { zipTree( it ) }
+    }
+    into file( unpackDir )
 }
 
 task deployContentStudio( type: DefaultTask ) {
@@ -74,13 +82,6 @@ task deployContentStudio( type: DefaultTask ) {
     }
 }
 
-task unpackDistro( type: Copy ) {
-    from {
-        configurations.testPerformance.collect { zipTree( it ) }
-    }
-    into file( unpackDir )
-}
-
 task startServer( dependsOn: [unpackDistro, deployContentStudio] ) {
     doLast {
         // logging.captureStandardOutput LogLevel.INFO
@@ -92,11 +93,30 @@ task startServer( dependsOn: [unpackDistro, deployContentStudio] ) {
     deployContentStudio.mustRunAfter unpackDistro
 }
 
+task copyApps( type: Copy ) {
+    println 'Copying apps from:'
+    println appDir
+    println 'to:'
+    println deployDir
+
+    from file( appDir )
+    include '*.jar'
+    into file( deployDir )
+}
+
+task runPerformanceTests( type: Exec, dependsOn: [startServer, copyApps] ) {
+    commandLine "k6", "run", "src/main/k6/create_user_test.js"
+    
+}
+
+runPerformanceTests.finalizedBy = ['stopServer']
+
 task stopServer {
     doLast {
         xpServer.stop()
     }
 }
+
 
 task printProps {
     doLast {
