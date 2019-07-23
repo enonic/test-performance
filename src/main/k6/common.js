@@ -6,7 +6,7 @@ import http from "k6/http";
 import * as utils from "./utils.js";
 
 export function xp_login(username, password, baseUrl, debug) {
-    let res = http.post(utils.loginUrl(baseUrl), utils.payloadForLogin(username, password), utils.defaultParams());
+    let res = http.post(utils.loginUrl(baseUrl), JSON.stringify(utils.payloadForLogin(username, password)), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Login: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -16,7 +16,7 @@ export function xp_login(username, password, baseUrl, debug) {
 export function installApp(baseUrl, appUrl, debug) {
     let url = utils.installAppUrl(baseUrl);
     let payload = utils.payloadForInstallApp(appUrl);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Install application: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -26,7 +26,7 @@ export function installApp(baseUrl, appUrl, debug) {
 export function uninstallApp(baseUrl, key, debug) {
     let url = utils.uninstallAppUrl(baseUrl);
     let payload = utils.payloadForUninstallApp(key);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Uninstall application: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -36,7 +36,7 @@ export function uninstallApp(baseUrl, key, debug) {
 export function createFolder(name, baseUrl, debug) {
     let url = utils.createContentUrl(baseUrl);
     let payload = utils.payloadForCreateRootFolder(name, "My folder");
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Create folder: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -46,7 +46,7 @@ export function createFolder(name, baseUrl, debug) {
 export function createUser(name, email, password, baseUrl, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForCreateUser(name, email, password);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Create User: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -56,7 +56,7 @@ export function createUser(name, email, password, baseUrl, debug) {
 export function deleteUser(baseUrl, displayName, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteSystemUser(displayName);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Delete User action: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -66,7 +66,7 @@ export function deleteUser(baseUrl, displayName, debug) {
 export function createRole(baseUrl, displayName, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForCreateRole(displayName);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Create Role: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -76,7 +76,7 @@ export function createRole(baseUrl, displayName, debug) {
 export function deleteRole(baseUrl, displayName, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteRole(displayName);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Delete Role action: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -86,7 +86,7 @@ export function deleteRole(baseUrl, displayName, debug) {
 export function createSystemGroup(baseUrl, displayName, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForCreateSystemGroup(displayName);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Create Group: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -96,7 +96,7 @@ export function createSystemGroup(baseUrl, displayName, debug) {
 export function deleteSystemGroup(baseUrl, displayName, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteSystemGroup(displayName);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Delete Group action: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -106,7 +106,7 @@ export function deleteSystemGroup(baseUrl, displayName, debug) {
 export function addMembersToSystemGroup(baseUrl, displayName, members, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForAddMembersToSystemGroup(displayName, members);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Updating of the Group: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -116,7 +116,7 @@ export function addMembersToSystemGroup(baseUrl, displayName, members, debug) {
 export function addMembersToRole(baseUrl, displayName, members, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForAddMembersToRole(displayName, members);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Updating of the Role: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -126,7 +126,7 @@ export function addMembersToRole(baseUrl, displayName, members, debug) {
 export function createUserStore(baseUrl, displayName, key, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForCreateUserStore(displayName, key);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Creating of User Store: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -136,7 +136,7 @@ export function createUserStore(baseUrl, displayName, key, debug) {
 export function updatePermissionsInUserStore(baseUrl, displayName, key, permissions, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForUpdatePermissionsInUserStore(displayName, key, permissions);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Update User Store action: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -146,7 +146,7 @@ export function updatePermissionsInUserStore(baseUrl, displayName, key, permissi
 export function deleteUserStore(baseUrl, key, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForDeleteUserStore(key);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Delete User Store action: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -156,7 +156,7 @@ export function deleteUserStore(baseUrl, key, debug) {
 export function addMembershipsToUser(baseUrl, displayName, email, memberships, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForAddMembershipsToUser(displayName, email, memberships);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         console.log("Update User action: status=" + String(res.status) + "  Body=" + res.body);
     }
@@ -166,7 +166,7 @@ export function addMembershipsToUser(baseUrl, displayName, email, memberships, d
 export function aggregateRoles(baseUrl, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForAggregate(["ROLE"]);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         let body = JSON.parse(res.body);
         console.log("Aggregate Roles action: status=" + String(res.status) + "  totalCount=" + body.data.userItemsConnection.totalCount);
@@ -177,7 +177,7 @@ export function aggregateRoles(baseUrl, debug) {
 export function filterItemsByName(baseUrl, name, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForFilterUserItems(name);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         let body = JSON.parse(res.body);
         console.log("Filter user items action: status=" + String(res.status) + "  totalCount=" + body.data.userItemsConnection.totalCount);
@@ -188,7 +188,7 @@ export function filterItemsByName(baseUrl, name, debug) {
 export function aggregateRolesAndUsers(baseUrl, debug) {
     let url = utils.userUrl(baseUrl);
     let payload = utils.payloadForAggregate(["ROLE", "USER"]);
-    let res = http.post(url, payload, utils.defaultParams());
+    let res = http.post(url, JSON.stringify(payload), utils.defaultParams());
     if (typeof debug !== 'undefined') {
         let body = JSON.parse(res.body);
         console.log("Aggregate Roles and Users action: status=" + String(res.status) + "  totalCount=" +

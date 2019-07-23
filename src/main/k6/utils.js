@@ -1,6 +1,8 @@
 //
 // This file contains methods, that generate and build payloads, URLs...
 //
+import http from "k6/http";
+import {check} from "k6";
 
 export function userUrl(baseUrl) {
     return baseUrl + '/tool/com.enonic.xp.app.users/main/_/service/com.enonic.xp.app.users/graphql';
@@ -13,9 +15,11 @@ export function createContentUrl(baseUrl) {
 export function installAppUrl(baseUrl) {
     return baseUrl + '/application/installUrl';
 }
+
 export function uninstallAppUrl(baseUrl) {
     return baseUrl + '/application/uninstall';
 }
+
 export function updateContentUrl(baseUrl) {
     return baseUrl + '/content/update/';
 }
@@ -37,17 +41,15 @@ export function defaultParams() {
 }
 
 export function payloadForLogin(username, password) {
-    let payload = {user: username, password: password};
-    return JSON.stringify(payload);
+    return {user: username, password: password};
 }
 
 export function payloadForInstallApp(url) {
-    let body = {URL: url};
-    return JSON.stringify(body);
+    return {URL: url};
 }
+
 export function payloadForUninstallApp(key) {
-    let body = {key: key};
-    return JSON.stringify(body);
+    return {key: key};
 }
 
 // creates a JSON string for the request's body for creating new folder in root directory
@@ -56,7 +58,7 @@ export function payloadForCreateRootFolder(name, displayName, permissions) {
     if (permissions != undefined) {
         body.permissions = permissions;
     }
-    return JSON.stringify(body);
+    return body;
 }
 
 export function payloadForDeleteSystemUser(displayName) {
@@ -70,7 +72,7 @@ export function payloadForDeleteSystemUser(displayName) {
     const variables = {
         keys: [`user:system:${displayName}`],
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 // creates a JSON string for the request's body for creating new user in system store
@@ -98,7 +100,7 @@ export function payloadForCreateUser(displayName, email, password) {
         memberships: [],
         password: password
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 export function payloadForCreateRole(displayName) {
@@ -116,7 +118,7 @@ export function payloadForCreateRole(displayName) {
         members: [],
         description: ''
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 export function payloadForCreateImage(name, displayName, testCounter, parentFolder, permissions) {
@@ -129,9 +131,13 @@ export function payloadForCreateSuperHeroPost(name, displayName, testCounter, pa
         {"name": "tags", "type": "String", "values": [{"v": "SH-" + testCounter}]},
         {"name": "enableComments", "type": "Boolean", "values": [{"v": true}]},
         {"name": "stickyPost", "type": "Boolean", "values": [{"v": false}]},
-        {"name": "slideshow", "type": "Boolean","values": [{"v": true}]},
+        {"name": "slideshow", "type": "Boolean", "values": [{"v": true}]},
         {"name": "author", "type": "Reference", "values": [{"v": "22354f06-b64e-48d8-959d-da5f8c27a424"}]},
-        {"name": "category", "type": "Reference", "values": [{"v": "e656bc02-10dd-45b1-b30f-c9deef28aa6f"}, {"v": "11b7c8c5-5633-47d3-a488-9c4d5060b690"}]}
+        {
+            "name": "category",
+            "type": "Reference",
+            "values": [{"v": "e656bc02-10dd-45b1-b30f-c9deef28aa6f"}, {"v": "11b7c8c5-5633-47d3-a488-9c4d5060b690"}]
+        }
     ];
     // let payloadMeta = [
     //     {
@@ -139,12 +145,20 @@ export function payloadForCreateSuperHeroPost(name, displayName, testCounter, pa
     //         "name": "com.enonic.app.superhero:menu-item"
     //     }];
     let payloadMeta = [];
-    let body = {data: payloadData, meta: payloadMeta, displayName: displayName, parent: parentFolder, name: name, contentType: "com.enonic.app.superhero:post", requireValid: false};
+    let body = {
+        data: payloadData,
+        meta: payloadMeta,
+        displayName: displayName,
+        parent: parentFolder,
+        name: name,
+        contentType: "com.enonic.app.superhero:post",
+        requireValid: false
+    };
     if (permissions != undefined) {
         body.permissions = permissions;
     }
     // console.log('SuperHero payload: ' + JSON.stringify(body));
-    return JSON.stringify(body);
+    return body;
 }
 
 export function payloadForDeleteRole(displayName) {
@@ -158,7 +172,7 @@ export function payloadForDeleteRole(displayName) {
     const variables = {
         keys: [`role:${displayName}`],
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 export function payloadForDeleteUserStore(key) {
@@ -172,7 +186,7 @@ export function payloadForDeleteUserStore(key) {
     const variables = {
         keys: [key],
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 
 }
 
@@ -209,7 +223,7 @@ export function payloadForCreateUserStore(displayName, key) {
             {principal: "role:system.user.admin", access: "ADMINISTRATOR"}],
         description: 'test api'
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 export function payloadForUpdatePermissionsInUserStore(displayName, key, permissions) {
@@ -243,7 +257,7 @@ export function payloadForUpdatePermissionsInUserStore(displayName, key, permiss
         permissions: permissions,
         description: 'test api'
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 export function payloadForAddMembersToRole(displayName, members) {
@@ -262,7 +276,7 @@ export function payloadForAddMembersToRole(displayName, members) {
         addMembers: members,
         removeMembers: [],
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 export function payloadForAddMembershipsToUser(displayName, email, memberships) {
@@ -288,7 +302,7 @@ export function payloadForAddMembershipsToUser(displayName, email, memberships) 
         removeMembers: [],
         removeMemberships: []
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 export function payloadForAddMembersToSystemGroup(displayName, members) {
@@ -314,7 +328,7 @@ export function payloadForAddMembersToSystemGroup(displayName, members) {
         addMemberships: [],
         removeMemberships: []
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 export function payloadForCreateSystemGroup(displayName) {
@@ -338,7 +352,7 @@ export function payloadForCreateSystemGroup(displayName) {
         memberships: [],
         description: ''
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 export function payloadForDeleteSystemGroup(displayName) {
@@ -352,7 +366,7 @@ export function payloadForDeleteSystemGroup(displayName) {
     const variables = {
         keys: [`group:system:${displayName}`],
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 export function payloadForUpdateFolder(id, contentName, newDisplayName, permissions) {
@@ -360,19 +374,19 @@ export function payloadForUpdateFolder(id, contentName, newDisplayName, permissi
     if (permissions != undefined) {
         body.permissions = permissions;
     }
-    return JSON.stringify(body);
+    return body;
 }
 
 // payload for delete a 'offline'-folder
 export function payloadForDeleteContent(contentPaths) {
     // console.log("DEBUG (delete content): ##### PATH is :" + contentPaths[0]);
     let payload = {contentPaths: contentPaths, deleteOnline: false};
-    return JSON.stringify(payload);
+    return payload;
 }
 
 export function payloadForPublishContent(ids) {
     let body = {ids: ids, excludedIds: [], excludeChildrenIds: ids, schedule: null};
-    return JSON.stringify(body);
+    return body;
 }
 
 export function payloadForFilterUserItems(query) {
@@ -399,7 +413,7 @@ export function payloadForFilterUserItems(query) {
     const variables = {
         query: query
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 
@@ -427,7 +441,7 @@ export function payloadForAggregate(types) {
     const variables = {
         types: types
     };
-    return JSON.stringify({mutation, variables});
+    return {mutation, variables};
 }
 
 // create Full Access permissions for Anonymous User
@@ -456,10 +470,95 @@ export function storeWithPermissionsForEveryone() {
         {principal: "role:system.user.admin", access: "ADMINISTRATOR"},
         {principal: "role:system.everyone", access: "CREATE_USERS"}
     ]
-
-
 }
 
 export function inheritPermissions() {
     return {"inheritPermissions": true};
+}
+
+/**
+ * Method to send an http request and test the result with several k6 checks.
+ * If the payloadString is null, the http request will be a GET request, otherwise, a POST request.
+ *
+ * @param url - The URL to test.  Mandatory
+ * @param payload - The JSON payload.  If null or undefined, the URL will be requested as a GET.
+ * @param metric - Optional k6 metric to supply the stats to.
+ * @param contentType - Optional contentType for POST-requests.  Default is "application/json".
+ * @param debug - Optional value to print http-request data to console.
+ * @param logJson - Optional value to print Json-body to console.
+ * @returns {*}
+ */
+export function testUrl(url, payload, metric, contentType, debug, logJson) {
+
+    let payloadString = '';
+    let res = '';
+
+    if (contentType == null) {
+        contentType = "application/json";
+    }
+
+    if (payload == null) {
+        // console.log('GET: ' + url);
+        res = http.get(url);
+    } else {
+        // console.log('POST: ' + url);
+        payloadString = JSON.stringify(payload);
+        res = http.post(url, payloadString, {headers: {"Content-Type": contentType}});
+    }
+
+    check(res, {
+        "status is 200": (res) => res.status === 200,
+        ["content-type is " + contentType]: (res) => res.headers['Content-Type'] === contentType,
+    });
+    if (typeof metric !== 'undefined') {
+        metric.add(res.timings.duration);
+    }
+
+    if (debug) {
+        if (res.status === 200) {
+            console.log("Response status: " + res.status);
+            console.log("Proto: " + res.proto);
+            console.log("Subproto: " + res.subproto);
+            console.log("Method: " + res.method);
+            console.log("Url: " + res.url);
+            console.log("Name: " + res.name);
+            console.log("Group: " + res.group);
+            console.log("Check: " + res.check);
+            console.log("Error: " + res.error);
+            console.log("TLS_version: " + res.tls_version);
+            console.log("VU: " + __VU);
+            console.log("Iteration no: " + __ITER);
+            console.log(`VU: ${__VU}  -  ITER: ${__ITER}\n`);
+        } else {
+            console.log("Response error: " + res.status);
+            console.log(" - with url: " + url);
+            console.log(" - with payload: " + payloadString);
+            console.log(" - with response: " + res.body + "\n");
+        }
+    }
+
+    // Display result to console (should be turned off for real tests):
+    if (logJson) {
+        let body = JSON.parse(res.body);
+        let text = '';
+        for (let key in body.data) {
+            text += 'Index is: ' + key + '\nDescription is:  ' + JSON.stringify(body.data[key]) + '\n'
+        }
+        console.log("JSON output:");
+        console.log("ID: " + body.id);
+        console.log(text);
+    }
+
+    if (contentType === "application/json") {
+        let body = JSON.parse(res.body);
+        if (debug) {
+            console.log('Returned Body:');
+            if (typeof body.id !== 'undefined') {
+                console.log(body.id + ' / Name: ' + body.name + '\n');
+            } else {
+                console.log("Body: " + res.body + '\n');
+            }
+        }
+        return body.id;
+    }
 }
