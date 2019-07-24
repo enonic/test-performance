@@ -33,7 +33,7 @@ export function uninstallApp(baseUrl, key, debug) {
     return res;
 }
 
-export function createFolder(name, baseUrl, debug) {
+export function createRootFolder(name, baseUrl, debug) {
     let url = utils.createContentUrl(baseUrl);
     let payload = utils.payloadForCreateRootFolder(name, "My folder");
     let res = http.post(url, JSON.stringify(payload), utils.defaultParams());

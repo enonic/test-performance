@@ -50,7 +50,7 @@ export default function () {
     group("delete_folder", function () {
 
         let contentName = 'folder-' + Math.floor((Math.random() * 1000000000) + 1);
-        let res = common.createFolder(contentName, baseUrl);
+        let res = common.createRootFolder(contentName, baseUrl);
         sleep(10);
         let response = JSON.parse(res.body);
         console.log("ID of the content to delete is: " + response.id);

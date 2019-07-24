@@ -50,7 +50,7 @@ export default function () {
     group("create_publish_folder", function () {
 
         let contentName = 'folder-' + Math.floor((Math.random() * 1000000000) + 1);
-        let res = common.createFolder(contentName, baseUrl);
+        let res = common.createRootFolder(contentName, baseUrl);
         let response = JSON.parse(res.body);
         console.log("ID of the content to publish is: " + response.id);
         let res2 = publishContent(response.id, true);

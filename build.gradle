@@ -109,11 +109,9 @@ task runServerDataInit( type: Exec ) {
 }
 
 task runPerformanceTests( type: Exec, dependsOn: [startServer, copyApps, runServerDataInit] ) {
-    doLast {
-        commandLine "k6", "run", "src/main/k6/performance.js"
-    }
     copyApps.mustRunAfter( startServer )
     runServerDataInit.mustRunAfter( copyApps )
+    commandLine "k6", "run", "src/main/k6/performance.js", "--out", "cloud"
 }
 
 runPerformanceTests.finalizedBy = ['stopServer']

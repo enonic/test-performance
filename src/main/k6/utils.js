@@ -20,6 +20,10 @@ export function uninstallAppUrl(baseUrl) {
     return baseUrl + '/application/uninstall';
 }
 
+export function getContentUrl(baseUrl, contentId) {
+    return baseUrl + '/content?id=' + contentId;
+}
+
 export function updateContentUrl(baseUrl) {
     return baseUrl + '/content/update/';
 }
@@ -50,15 +54,6 @@ export function payloadForInstallApp(url) {
 
 export function payloadForUninstallApp(key) {
     return {key: key};
-}
-
-// creates a JSON string for the request's body for creating new folder in root directory
-export function payloadForCreateRootFolder(name, displayName, permissions) {
-    let body = {data: [], meta: [], displayName: displayName, parent: '/', name: name, contentType: "base:folder", requireValid: false};
-    if (permissions != undefined) {
-        body.permissions = permissions;
-    }
-    return body;
 }
 
 export function payloadForDeleteSystemUser(displayName) {
@@ -369,6 +364,25 @@ export function payloadForDeleteSystemGroup(displayName) {
     return {mutation, variables};
 }
 
+
+
+// creates a JSON string for the request's body for creating new folder in root directory
+export function payloadForCreateRootFolder(name, displayName, permissions) {
+    let body = {data: [], meta: [], displayName: displayName, parent: '/', name: name, contentType: "base:folder", requireValid: false};
+    if (permissions != undefined) {
+        body.permissions = permissions;
+    }
+    return body;
+}
+
+export function payloadForCreateFolder(name, displayName, parent, permissions) {
+    let body = {data: [], meta: [], displayName: displayName, parent: parent, name: name, contentType: "base:folder", requireValid: false};
+    if (permissions != undefined) {
+        body.permissions = permissions;
+    }
+    return body;
+}
+
 export function payloadForUpdateFolder(id, contentName, newDisplayName, permissions) {
     let body = {contentId: id, data: [], meta: [], contentName: contentName, displayName: newDisplayName, inheritPermissions: false};
     if (permissions != undefined) {
@@ -377,7 +391,7 @@ export function payloadForUpdateFolder(id, contentName, newDisplayName, permissi
     return body;
 }
 
-// payload for delete a 'offline'-folder
+// payload for delete an 'offline'-folder
 export function payloadForDeleteContent(contentPaths) {
     // console.log("DEBUG (delete content): ##### PATH is :" + contentPaths[0]);
     let payload = {contentPaths: contentPaths, deleteOnline: false};

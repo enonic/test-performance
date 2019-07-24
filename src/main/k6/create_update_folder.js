@@ -50,7 +50,7 @@ export default function () {
     group("create_update_folder", function () {
 
         let contentName = 'content-' + Math.floor((Math.random() * 1000000000) + 1);
-        let res = common.createFolder(contentName,baseUrl);
+        let res = common.createRootFolder(contentName,baseUrl);
         let objJSON = JSON.parse(res.body);
         console.log("ID of the content to update is: " + objJSON.id);
         console.log("Content's name is: " + objJSON.name);

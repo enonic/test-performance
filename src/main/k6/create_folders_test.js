@@ -34,7 +34,7 @@ export default function () {
     group("create_folder", function () {
 
         let contentName = 'folder-' + Math.floor((Math.random() * 1000000000) + 1);
-        let res = common.createFolder(contentName, baseUrl, true);
+        let res = common.createRootFolder(contentName, baseUrl, true);
 
         check(res, {
             "status is 200": (res) => res.status === 200,
