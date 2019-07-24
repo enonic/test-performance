@@ -87,7 +87,7 @@ task startServer( dependsOn: [unpackDistro, deployContentStudio] ) {
         // logging.captureStandardOutput LogLevel.INFO
         // ext.xpServer = new ServerInstance()
         xpServer.installDir = file( distroDir )
-        xpServer.startupDelay = 10000
+        xpServer.startupDelay = 12000
         xpServer.start()
     }
     deployContentStudio.mustRunAfter unpackDistro
@@ -104,9 +104,16 @@ task copyApps( type: Copy ) {
     into file( deployDir )
 }
 
-task runPerformanceTests( type: Exec, dependsOn: [startServer, copyApps] ) {
-    commandLine "k6", "run", "src/main/k6/create_user_test.js"
-    
+task runServerDataInit( type: Exec ) {
+    commandLine "k6", "run", "src/main/k6/server_data_init.js"
+}
+
+task runPerformanceTests( type: Exec, dependsOn: [startServer, copyApps, runServerDataInit] ) {
+    doLast {
+        commandLine "k6", "run", "src/main/k6/performance.js"
+    }
+    copyApps.mustRunAfter( startServer )
+    runServerDataInit.mustRunAfter( copyApps )
 }
 
 runPerformanceTests.finalizedBy = ['stopServer']

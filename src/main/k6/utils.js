@@ -510,7 +510,7 @@ export function testUrl(url, payload, metric, contentType, debug, logJson) {
         "status is 200": (res) => res.status === 200,
         ["content-type is " + contentType]: (res) => res.headers['Content-Type'] === contentType,
     });
-    if (typeof metric !== 'undefined') {
+    if (metric) {
         metric.add(res.timings.duration);
     }
 
@@ -539,26 +539,32 @@ export function testUrl(url, payload, metric, contentType, debug, logJson) {
 
     // Display result to console (should be turned off for real tests):
     if (logJson) {
-        let body = JSON.parse(res.body);
-        let text = '';
-        for (let key in body.data) {
-            text += 'Index is: ' + key + '\nDescription is:  ' + JSON.stringify(body.data[key]) + '\n'
+        if (res.body) {
+            let body = JSON.parse(res.body);
+            let text = '';
+            for (let key in body.data) {
+                text += 'Index is: ' + key + '\nDescription is:  ' + JSON.stringify(body.data[key]) + '\n'
+            }
+            console.log("JSON output:");
+            console.log("ID: " + body.id);
+            console.log(text);
+        } else {
+            console.log("The request has no body.")
         }
-        console.log("JSON output:");
-        console.log("ID: " + body.id);
-        console.log(text);
     }
 
     if (contentType === "application/json") {
-        let body = JSON.parse(res.body);
-        if (debug) {
-            console.log('Returned Body:');
-            if (typeof body.id !== 'undefined') {
-                console.log(body.id + ' / Name: ' + body.name + '\n');
-            } else {
-                console.log("Body: " + res.body + '\n');
+        if (res.body) {
+            let body = JSON.parse(res.body);
+            if (debug) {
+                console.log('Returned Body:');
+                if (typeof body.id !== 'undefined') {
+                    console.log(body.id + ' / Name: ' + body.name + '\n');
+                } else {
+                    console.log("Body: " + res.body + '\n');
+                }
             }
+            return body.id;
         }
-        return body.id;
     }
 }
