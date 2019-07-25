@@ -15,15 +15,15 @@ export let options = {
     thresholds: {
         "http_req_connecting": ["avg<1", "p(95)<1"],
         "http_req_duration": ["avg<300", "p(95)<2000"],
-        "auth_login": ["avg<250", "p(95)<600"],
+        "auth_login": ["avg<250", "p(95)<800"],
         "auth_authenticated": ["avg<8", "p(95)<25"],
         "content_create_folder": ["avg<1400", "p(95)<3000"],
-        "content_get_folder": ["avg<50", "p(95)<150"],
+        "content_get_folder": ["avg<50", "p(95)<180"],
         "content_update_folder": ["avg<120", "p(95)<350"],
         "content_publish_folder": ["avg<20", "p(95)<90"],
         "content_create": ["avg<1400", "p(95)<3000"],
         "content_publish": ["avg<20", "p(95)<90"],
-        "content_get": ["avg<35", "p(95)<110"],
+        "content_get": ["avg<35", "p(95)<150"],
         "content_delete_folder": ["avg<20", "p(95)<90"],
         "content_publish_delete": ["avg<20", "p(95)<90"]
     },
