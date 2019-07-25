@@ -9,23 +9,23 @@ import * as utils from "./utils.js";
 export let options = {
     stages: [
         {duration: "20s", target: "100"},
-        {duration: "80s", target: "125"},
+        {duration: "80s", target: "150"},
         {duration: "20s", target: "0"}
     ],
     thresholds: {
-        "http_req_connecting": ["max<3"],
+        "http_req_connecting": ["avg<1", "p(95)<1"],
         "http_req_duration": ["avg<200", "p(95)<1400"],
-        "auth_login": ["avg<200", "p(95)<500"],
-        "auth_authenticated": ["avg<4", "p(95)<10"],
-        "content_create_folder": ["avg<800", "p(95)<1800"],
-        "content_get_folder": ["avg<15", "p(95)<40"],
-        "content_update_folder": ["avg<80", "p(95)<200"],
-        "content_publish_folder": ["avg<18", "p(95)<60"],
+        "auth_login": ["avg<250", "p(95)<600"],
+        "auth_authenticated": ["avg<5", "p(95)<15"],
+        "content_create_folder": ["avg<1000", "p(95)<2000"],
+        "content_get_folder": ["avg<50", "p(95)<125"],
+        "content_update_folder": ["avg<120", "p(95)<350"],
+        "content_publish_folder": ["avg<15", "p(95)<60"],
         "content_create": ["avg<1000", "p(95)<2000"],
-        "content_publish": ["avg<2", "p(95)<6"],
-        "content_get": ["avg<9", "p(95)<25"],
-        "content_delete_folder": ["avg<3", "p(95)<9"],
-        "content_publish_delete": ["avg<3", "p(95)<9"]
+        "content_publish": ["avg<15", "p(95)<60"],
+        "content_get": ["avg<25", "p(95)<90"],
+        "content_delete_folder": ["avg<15", "p(95)<60"],
+        "content_publish_delete": ["avg<15", "p(95)<60"]
     },
     ext: {
         loadimpact: {
