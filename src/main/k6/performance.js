@@ -8,24 +8,31 @@ import * as utils from "./utils.js";
 
 export let options = {
     stages: [
-        {duration: "20s", target: "120"},
-        // {duration: "60s", target: "150"},
+        {duration: "20s", target: "100"},
+        {duration: "80s", target: "125"},
         {duration: "20s", target: "0"}
     ],
     thresholds: {
-        "http_req_connecting": ["max<5"],
-        "http_req_duration": ["p(95)<1000", "avg<200"],
-        "auth_login": ["avg<150", "p(95)<500"],
-        "auth_authenticated": ["avg<2", "p(95)<5"],
-        "content_create_folder": ["avg<800", "p(95)<2000"],
-        "content_create": ["avg<600", "p(95)<1500"],
-        "content_update_folder": ["avg<20", "p(95)<50"],
-        "content_publish_folder": ["avg<2", "p(95)<5"]
+        "http_req_connecting": ["max<3"],
+        "http_req_duration": ["avg<200", "p(95)<1400"],
+        "auth_login": ["avg<200", "p(95)<500"],
+        "auth_authenticated": ["avg<4", "p(95)<10"],
+        "content_create_folder": ["avg<800", "p(95)<1800"],
+        "content_get_folder": ["avg<15", "p(95)<40"],
+        "content_update_folder": ["avg<80", "p(95)<200"],
+        "content_publish_folder": ["avg<18", "p(95)<60"],
+        "content_create": ["avg<1000", "p(95)<2000"],
+        "content_publish": ["avg<2", "p(95)<6"],
+        "content_get": ["avg<9", "p(95)<25"],
+        "content_delete_folder": ["avg<3", "p(95)<9"],
+        "content_publish_delete": ["avg<3", "p(95)<9"]
     },
     ext: {
         loadimpact: {
             projectID: 3114611,
             name: "K6 performance research",
+            //projectID: 3465338,
+            //name: "XP nightly",
             distribution: {
                 scenarioLabel1: {loadZone: "amazon:sg:singapore", percent: 50},
                 scenarioLabel2: {loadZone: "amazon:us:ashburn", percent: 50}

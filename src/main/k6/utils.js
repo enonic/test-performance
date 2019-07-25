@@ -506,6 +506,12 @@ export function testUrl(url, payload, metric, contentType, debug, logJson) {
 
     let payloadString = '';
     let res = '';
+    let tagName = '';
+    if (metric) {
+        tagName = metric.name;
+    } else {
+        tagName = "testUrl";
+    }
 
     if (contentType == null) {
         contentType = "application/json";
@@ -513,11 +519,11 @@ export function testUrl(url, payload, metric, contentType, debug, logJson) {
 
     if (payload == null) {
         // console.log('GET: ' + url);
-        res = http.get(url);
+        res = http.get(url, {tags: {name: tagName}});
     } else {
         // console.log('POST: ' + url);
         payloadString = JSON.stringify(payload);
-        res = http.post(url, payloadString, {headers: {"Content-Type": contentType}});
+        res = http.post(url, payloadString, {headers: {"Content-Type": contentType}, tags: {name: tagName}});
     }
 
     check(res, {
