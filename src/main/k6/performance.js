@@ -29,10 +29,10 @@ export let options = {
     },
     ext: {
         loadimpact: {
-            projectID: 3114611,
-            name: "K6 performance research",
-            //projectID: 3465338,
-            //name: "XP nightly",
+            //projectID: 3114611,
+            //name: "K6 performance research",
+            projectID: 3465338,
+            name: "XP nightly",
             distribution: {
                 scenarioLabel1: {loadZone: "amazon:sg:singapore", percent: 50},
                 scenarioLabel2: {loadZone: "amazon:us:ashburn", percent: 50}
