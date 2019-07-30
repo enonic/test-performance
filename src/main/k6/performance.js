@@ -16,7 +16,7 @@ export let options = {
         "http_req_connecting": ["avg<1", "p(95)<1"],
         "http_req_duration": ["avg<300", "p(95)<2000"],
         "auth_login": ["avg<250", "p(95)<800"],
-        "auth_authenticated": ["avg<8", "p(95)<25"],
+        "auth_authenticated": ["avg<8", "p(95)<35"],
         "content_create_folder": ["avg<1400", "p(95)<3000"],
         "content_get_folder": ["avg<75", "p(95)<300"],
         "content_update_folder": ["avg<180", "p(95)<600"],
