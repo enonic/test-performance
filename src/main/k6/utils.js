@@ -149,12 +149,42 @@ export function payloadForCreateSuperHeroPost(name, displayName, testCounter, pa
         contentType: "com.enonic.app.superhero:post",
         requireValid: false
     };
-    if (permissions != undefined) {
+    if (permissions) {
         body.permissions = permissions;
     }
     // console.log('SuperHero payload: ' + JSON.stringify(body));
     return body;
 }
+
+export function payloadForUpdateSuperHeroPost(id, newContentName, newDisplayName, testCounter, newPermissions) {
+    let payloadData = [
+        {"name": "post", "type": "String", "values": [{"v": "<p>This is the new " + testCounter + " text!</p>\n"}]},
+        {"name": "tags", "type": "String", "values": [{"v": "new SH-" + testCounter}]},
+        {"name": "enableComments", "type": "Boolean", "values": [{"v": true}]},
+        {"name": "stickyPost", "type": "Boolean", "values": [{"v": false}]},
+        {"name": "slideshow", "type": "Boolean", "values": [{"v": true}]},
+        {"name": "author", "type": "Reference", "values": [{"v": "22354f06-b64e-48d8-959d-da5f8c27a424"}]},
+        {
+            "name": "category",
+            "type": "Reference",
+            "values": [{"v": "e656bc02-10dd-45b1-b30f-c9deef28aa6f"}, {"v": "11b7c8c5-5633-47d3-a488-9c4d5060b690"}]
+        }
+    ];
+
+    let body = {
+        contentId: id,
+        contentName: newContentName,
+        displayName: newDisplayName,
+        data: payloadData,
+        meta: []
+    };
+    if (newPermissions) {
+        body.permissions = newPermissions;
+    }
+    return body;
+}
+
+
 
 export function payloadForDeleteRole(displayName) {
     const mutation = `mutation ($keys: [String]!) {
@@ -369,7 +399,7 @@ export function payloadForDeleteSystemGroup(displayName) {
 // creates a JSON string for the request's body for creating new folder in root directory
 export function payloadForCreateRootFolder(name, displayName, permissions) {
     let body = {data: [], meta: [], displayName: displayName, parent: '/', name: name, contentType: "base:folder", requireValid: false};
-    if (permissions != undefined) {
+    if (permissions) {
         body.permissions = permissions;
     }
     return body;
@@ -377,7 +407,7 @@ export function payloadForCreateRootFolder(name, displayName, permissions) {
 
 export function payloadForCreateFolder(name, displayName, parent, permissions) {
     let body = {data: [], meta: [], displayName: displayName, parent: parent, name: name, contentType: "base:folder", requireValid: false};
-    if (permissions != undefined) {
+    if (permissions) {
         body.permissions = permissions;
     }
     return body;
@@ -385,7 +415,7 @@ export function payloadForCreateFolder(name, displayName, parent, permissions) {
 
 export function payloadForUpdateFolder(id, contentName, newDisplayName, permissions) {
     let body = {contentId: id, data: [], meta: [], contentName: contentName, displayName: newDisplayName, inheritPermissions: false};
-    if (permissions != undefined) {
+    if (permissions) {
         body.permissions = permissions;
     }
     return body;

@@ -9,7 +9,7 @@ import * as utils from "./utils.js";
 export let options = {
     stages: [
         {duration: "20s", target: "100"},
-        {duration: "80s", target: "150"},
+        {duration: "80s", target: "140"},
         {duration: "20s", target: "0"}
     ],
     thresholds: {
@@ -18,12 +18,13 @@ export let options = {
         "auth_login": ["avg<250", "p(95)<800"],
         "auth_authenticated": ["avg<8", "p(95)<25"],
         "content_create_folder": ["avg<1400", "p(95)<3000"],
-        "content_get_folder": ["avg<50", "p(95)<180"],
-        "content_update_folder": ["avg<120", "p(95)<350"],
+        "content_get_folder": ["avg<75", "p(95)<300"],
+        "content_update_folder": ["avg<180", "p(95)<600"],
         "content_publish_folder": ["avg<20", "p(95)<90"],
         "content_create": ["avg<1400", "p(95)<3000"],
+        "content_get": ["avg<50", "p(95)<200"],
+        "content_update": ["avg<1400", "p(95)<3000"],
         "content_publish": ["avg<20", "p(95)<90"],
-        "content_get": ["avg<35", "p(95)<150"],
         "content_delete_folder": ["avg<20", "p(95)<90"],
         "content_publish_delete": ["avg<20", "p(95)<90"]
     },
@@ -55,8 +56,9 @@ const updateFolderMetric = new Trend("content_update_folder");
 const publishFolderMetric = new Trend("content_publish_folder");
 
 const createContentMetric = new Trend("content_create");
-const publishContentMetric = new Trend("content_publish");
 const getContentMetric = new Trend("content_get");
+const updateContentMetric = new Trend("content_update");
+const publishContentMetric = new Trend("content_publish");
 
 const createImageMetric = new Trend("image_create");
 const publishImageMetric = new Trend("image_publish");
@@ -90,7 +92,7 @@ export default function () {
         });
         sleep(1);
 
-        group("verify-folder", function() {
+        group("verify-folder", function () {
             utils.testUrl(utils.getContentUrl(baseUrl, contentFolderId), null, getFolderMetric);
         });
 
@@ -101,7 +103,7 @@ export default function () {
         });
         sleep(1);
 
-        group("publish-folder", function() {
+        group("publish-folder", function () {
             utils.testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentFolderId]), publishFolderMetric);
         });
         sleep(1);
@@ -110,17 +112,26 @@ export default function () {
         group("create-content", function () {
             contentId = utils.testUrl(utils.createContentUrl(baseUrl),
                 utils.payloadForCreateSuperHeroPost("post-" + testCounter, "Post-" + testCounter, testCounter,
-                    "/superhero/test/folder-" + testCounter), createContentMetric, "application/json");
-        });
-        sleep(1);
-
-        group("publish-content", function () {
-            utils.testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentId]), publishContentMetric);
+                    "/superhero/test/folder-" + testCounter),
+                createContentMetric);
         });
         sleep(1);
 
         group("verify-content", function () {
             utils.testUrl(utils.getContentUrl(baseUrl, contentId), null, getContentMetric);
+        });
+        sleep(1);
+
+        group("update-content", function () {
+            utils.testUrl(utils.updateContentUrl(baseUrl),
+                utils.payloadForUpdateSuperHeroPost(contentId, "Updated Post-" + testCounter, "Updated Name - " + testCounter, testCounter,
+                    utils.anonymousPermissions()),
+                updateContentMetric);
+        });
+        sleep(1);
+
+        group("publish-content", function () {
+            utils.testUrl(utils.publishContentUrl(baseUrl), utils.payloadForPublishContent([contentId]), publishContentMetric);
         });
         sleep(1);
 
@@ -140,7 +151,8 @@ export default function () {
 
         // Delete all:
         group("delete-folder-with-content", function () {
-            utils.testUrl(utils.deleteContentUrl(baseUrl), utils.payloadForDeleteContent(["/superhero/test/folder-" + testCounter]), deleteFolderMetric);
+            utils.testUrl(utils.deleteContentUrl(baseUrl), utils.payloadForDeleteContent(["/superhero/test/folder-" + testCounter]),
+                deleteFolderMetric);
         });
         sleep(1);
 
