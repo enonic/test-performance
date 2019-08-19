@@ -43,7 +43,6 @@ export let options = {
 };
 
 // const baseUrl = 'https://qa.enonic.com/admin/rest';
-// const baseUrl = 'https://cluster-test.enonic.cloud/admin/rest';
 // const baseUrl = 'https://nightly.enonic.net/admin/rest';
 const baseUrl = 'http://127.0.0.1:8080/admin/rest';
 
@@ -75,15 +74,9 @@ export default function () {
         // Verify that user is authenticated:
         utils.testUrl(baseUrl + "/auth/authenticated", null, isAuthenticatedMetric);
 
-        // Get Image
-        // utils.testUrl(baseUrl + '/content/image/b46bbf33-f8d8-4146-a804-a58e78cc05f8?size=1213&ts=1528462056606', null, getImageMetric, "image/jpeg");  // QA
-        // utils.testUrl(baseUrl + '/content/image/be1ca151-cf61-4a54-9ea4-c8d01ce83e0e?size=1069', null, getImageMetric, "image/jpeg");  // localhost / nightly
-        // utils.testUrl(baseUrl + '/content/image/098a6549-9fe7-4027-8756-f7fd4254e43a?size=1069', null, getImageMetric, "image/jpeg");  // cluster-test.enonic.cloud
-
         let testCounter = Math.floor((Math.random() * 1000000000) + 1);
         let contentFolderId = "0";
         let contentId = "0";
-        let contentImageId = "0";
 
         // Folder:
         group("create-folder", function () {
