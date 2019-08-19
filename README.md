@@ -35,4 +35,7 @@ This project is set up to download the latest version of XP and run the tests on
 
 Since the tests run so self-contained, it is easy to run the test in a contiuously integrated environment, more or just like running the tests locally.
 The recommended way is to start a clean environment in some kind of container, like Docker, and run the tests there.
-   
+
+### GOTCHAs
+
+* 

@@ -19,14 +19,14 @@ export let options = {
         "auth_authenticated": ["avg<8", "p(95)<35"],
         "content_create_folder": ["avg<700", "p(95)<1800"],
         "content_get_folder": ["avg<75", "p(95)<300"],
-        "content_update_folder": ["avg<180", "p(95)<600"],
-        "content_publish_folder": ["avg<20", "p(95)<90"],
+        "content_update_folder": ["avg<100", "p(95)<250"],
+        "content_publish_folder": ["avg<12", "p(95)<45"],
         "content_create": ["avg<600", "p(95)<1500"],
         "content_get": ["avg<50", "p(95)<250"],
-        "content_update": ["avg<1400", "p(95)<3000"],
-        "content_publish": ["avg<20", "p(95)<90"],
+        "content_update": ["avg<700", "p(95)<1500"],
+        "content_publish": ["avg<12", "p(95)<45"],
         "content_delete_folder": ["avg<20", "p(95)<90"],
-        "content_publish_delete": ["avg<20", "p(95)<90"]
+        "content_publish_delete": ["avg<12", "p(95)<45"]
     },
     ext: {
         loadimpact: {
