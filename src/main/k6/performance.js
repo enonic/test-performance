@@ -14,8 +14,8 @@ export let options = {
     ],
     thresholds: {
         "http_req_connecting": ["avg<1", "p(95)<1"],
-        "http_req_duration": ["avg<300", "p(95)<2000"],
-        "auth_login": ["avg<250", "p(95)<800"],
+        "http_req_duration": ["avg<200", "p(95)<1000"],
+        "auth_login": ["avg<250", "p(95)<600"],
         "auth_authenticated": ["avg<8", "p(95)<35"],
         "content_create_folder": ["avg<700", "p(95)<1800"],
         "content_get_folder": ["avg<75", "p(95)<300"],
@@ -25,7 +25,7 @@ export let options = {
         "content_get": ["avg<50", "p(95)<250"],
         "content_update": ["avg<700", "p(95)<1500"],
         "content_publish": ["avg<12", "p(95)<45"],
-        "content_delete_folder": ["avg<20", "p(95)<90"],
+        "content_delete_folder": ["avg<10", "p(95)<50"],
         "content_publish_delete": ["avg<12", "p(95)<45"]
     },
     ext: {
