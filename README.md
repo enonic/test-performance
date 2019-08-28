@@ -20,7 +20,7 @@ This token is also needed in order to report the results to the cloud.
 
 ## Running tests with gradle
 
-### Running locally
+#### Running locally
 
 This project is set up to download the latest version of XP and run the tests on a contained instance of it.  To do so, it is important to note and do the following:
 
@@ -44,17 +44,19 @@ This project is set up to download the latest version of XP and run the tests on
   * Use the `--rerun-tasks` gradle option 
     * `> ./gradlew runPerformanceTests --rerun-tasks`
  
-### Continuous integration
+#### Continuous integration
 
 Since the tests run so self-contained, it is easy to run the test in a contiuously integrated environment, more or just like running the tests locally.
 The recommended way is to start a clean environment in some kind of container, like Docker, and run the tests there.
 
 ## Analyzing tests
 
+#### Local analysis using k6
 The k6 tool reports a large set of stats on the command line when it finishes with a test.
 These statistics should be monitored for changes from run to run, to detect performance issues.
 The best way to do this, is using the thresholds, like it has been done in this project (see performance.js, line 15-30).
 After running test tests 10-20 times, you get a feel for standardized values.  Set the thresholds slightly above this.
 
+#### Cloud analysis with Load Impact web-UI
 Tests that are run in the cloud, or where the results have been uploaded to the cloud, may be analyzed in the Load Impact web-UI: https://app.loadimpact.com
 The web-UI has a more extensive analysis of tests, discovering performance limits and suggest multiple reasons for what is going on when the performance is not as expected. 
