@@ -8,13 +8,13 @@ import * as utils from "./utils.js";
 
 export let options = {
     stages: [
-        {duration: "20s", target: "100"},
-        {duration: "80s", target: "140"},
-        {duration: "20s", target: "0"}
+        {duration: "25s", target: "100"},
+        {duration: "150s", target: "140"},
+        {duration: "25s", target: "0"}
     ],
     thresholds: {
         "http_req_connecting": ["avg<1", "p(95)<1"],
-        "http_req_duration": ["avg<200", "p(95)<1000"],
+        "http_req_duration": ["avg<250", "p(95)<1000"],
         "auth_login": ["avg<250", "p(95)<600"],
         "auth_authenticated": ["avg<8", "p(95)<35"],
         "content_create_folder": ["avg<700", "p(95)<1800"],
@@ -23,15 +23,13 @@ export let options = {
         "content_publish_folder": ["avg<12", "p(95)<45"],
         "content_create": ["avg<600", "p(95)<1500"],
         "content_get": ["avg<50", "p(95)<250"],
-        "content_update": ["avg<700", "p(95)<1500"],
+        "content_update": ["avg<900", "p(95)<1700"],
         "content_publish": ["avg<12", "p(95)<45"],
         "content_delete_folder": ["avg<10", "p(95)<50"],
         "content_publish_delete": ["avg<12", "p(95)<45"]
     },
     ext: {
         loadimpact: {
-            //projectID: 3114611,
-            //name: "K6 performance research",
             projectID: 3465338,
             name: "XP nightly",
             distribution: {
