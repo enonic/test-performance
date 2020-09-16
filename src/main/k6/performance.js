@@ -18,15 +18,15 @@ export let options = {
         "auth_login": ["avg<250", "p(95)<600"],
         "auth_authenticated": ["avg<8", "p(95)<35"],
         "content_create_folder": ["avg<2000", "p(95)<3000"],
-        "content_get_folder": ["avg<75", "p(95)<300"],
-        "content_update_folder": ["avg<500", "p(95)<1000"],
+        "content_get_folder": ["avg<50", "p(95)<100"],
+        "content_update_folder": ["avg<900", "p(95)<1500"],
         "content_publish_folder": ["avg<12", "p(95)<45"],
-        "content_create": ["avg<1500", "p(95)<2500"],
+        "content_create": ["avg<1600", "p(95)<2800"],
         "content_get": ["avg<50", "p(95)<250"],
-        "content_update": ["avg<2000", "p(95)<3000"],
-        "content_publish": ["avg<12", "p(95)<45"],
-        "content_delete_folder": ["avg<10", "p(95)<50"],
-        "content_publish_delete": ["avg<12", "p(95)<45"]
+        "content_update": ["avg<2400", "p(95)<3600"],
+        "content_publish": ["avg<10", "p(95)<40"],
+        "content_delete_folder": ["avg<10", "p(95)<45"],
+        "content_publish_delete": ["avg<10", "p(95)<45"]
     },
     ext: {
         loadimpact: {
