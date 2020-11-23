@@ -14,19 +14,19 @@ export let options = {
     ],
     thresholds: {
         "http_req_connecting": ["avg<1", "p(95)<1"],
-        "http_req_duration": ["avg<750", "p(95)<2800"],
+        "http_req_duration": ["avg<750", "p(95)<3000"],
         "auth_login": ["avg<250", "p(95)<600"],
         "auth_authenticated": ["avg<8", "p(95)<35"],
-        "content_create_folder": ["avg<2000", "p(95)<3000"],
+        "content_create_folder": ["avg<2000", "p(95)<3200"],
         "content_get_folder": ["avg<50", "p(95)<100"],
-        "content_update_folder": ["avg<900", "p(95)<1500"],
+        "content_update_folder": ["avg<900", "p(95)<1800"],
         "content_publish_folder": ["avg<12", "p(95)<45"],
-        "content_create": ["avg<1800", "p(95)<3000"],
+        "content_create": ["avg<2200", "p(95)<3500"],
         "content_get": ["avg<50", "p(95)<250"],
-        "content_update": ["avg<2400", "p(95)<4000"],
+        "content_update": ["avg<2600", "p(95)<4500"],
         "content_publish": ["avg<10", "p(95)<40"],
         "content_delete_folder": ["avg<10", "p(95)<45"],
-        "content_publish_delete": ["avg<10", "p(95)<45"]
+        "content_publish_delete": ["avg<12", "p(95)<50"]
     },
     ext: {
         loadimpact: {
