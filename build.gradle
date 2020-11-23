@@ -112,7 +112,8 @@ task runPerformanceTests( type: Exec, dependsOn: [startServer, copyApps, runServ
     copyApps.mustRunAfter( startServer )
     runServerDataInit.mustRunAfter( copyApps )
 //    commandLine "k6", "cloud", "src/main/k6/performance.js"
-    commandLine "k6", "run", "src/main/k6/performance.js", "--out", "cloud"
+//    commandLine "k6", "run", "src/main/k6/performance.js", "--out", "cloud"
+    commandLine "k6", "run", "src/main/k6/performance.js"
 }
 
 runPerformanceTests.finalizedBy = ['stopServer']
