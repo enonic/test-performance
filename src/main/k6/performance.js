@@ -24,7 +24,7 @@ export let options = {
         "content_create": ["avg<2200", "p(95)<4000"],
         "content_get": ["avg<50", "p(95)<250"],
         "content_update": ["avg<3000", "p(95)<5000"],
-        "content_publish": ["avg<10", "p(95)<40"],
+        "content_publish": ["avg<10", "p(95)<50"],
         "content_delete_folder": ["avg<10", "p(95)<45"],
         "content_publish_delete": ["avg<15", "p(95)<60"]
     },
