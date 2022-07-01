@@ -1,14 +1,5 @@
 import com.enonic.test.server.ServerInstance
 
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-            jcenter()
-        }
-    }
-}
-
 plugins {
     id 'java'
     id 'maven-publish'
